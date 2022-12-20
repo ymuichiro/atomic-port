@@ -3,17 +3,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const web3_1 = __importDefault(require("web3"));
 const CryptoService_1 = require("../cores/CryptoService");
-const HashedTimelockERC20_json_1 = __importDefault(require("../abis/HashedTimelockERC20.json"));
-const BaseEvmService_1 = __importDefault(require("./BaseEvmService"));
+const HashedTimelockERC721_json_1 = __importDefault(require("../abis/HashedTimelockERC721.json"));
 /**
  * Base class for HTLC operations on each EVM
  */
-class _PolygonErc721HtlcService extends BaseEvmService_1.default {
-    static provider = "https://rpc-mumbai.maticvigil.com";
-    static contractAddress = "0x6003028E5C3FB11c5F002902dDa1E18cF6a5D34B";
-    constructor(provider, contractAddress) {
-        super(HashedTimelockERC20_json_1.default.abi, provider ?? _PolygonErc721HtlcService.provider, contractAddress ?? _PolygonErc721HtlcService.contractAddress);
+class _EtherErc721HtlcServiceTest {
+    web3;
+    contract;
+    constructor() {
+        this.web3 = new web3_1.default(new web3_1.default.providers.HttpProvider("https://sepolia.infura.io/v3/85eb73cb20fc46058b5044657ed33efd"));
+        this.contract = new this.web3.eth.Contract(HashedTimelockERC721_json_1.default.abi, "0x010f8d96C3D3BbA7b3935da8B20AAB3C9E2F6264");
+    }
+    /**
+     * Obtain contract information for the current instance
+     */
+    getContractInfo(contractId) {
+        return this.contract.methods.getContract(contractId).call();
     }
     /**
      * Issue HTLC and obtain the key at the time of issue
@@ -36,4 +43,4 @@ class _PolygonErc721HtlcService extends BaseEvmService_1.default {
         return res.events.HTLCERC721Withdraw;
     }
 }
-exports.default = _PolygonErc721HtlcService;
+exports.default = _EtherErc721HtlcServiceTest;

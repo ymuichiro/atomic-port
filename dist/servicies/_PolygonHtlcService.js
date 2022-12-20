@@ -13,7 +13,7 @@ class _PolygonHtlcService extends BaseEvmService_1.default {
     static provider = "https://rpc-mumbai.maticvigil.com";
     static contractId = "0x6003028E5C3FB11c5F002902dDa1E18cF6a5D34B";
     constructor(provider, contractId) {
-        super(HashedTimelock_json_1.default, provider ?? _PolygonHtlcService.provider, contractId ?? _PolygonHtlcService.contractId);
+        super(HashedTimelock_json_1.default.abi, provider ?? _PolygonHtlcService.provider, contractId ?? _PolygonHtlcService.contractId);
     }
 }
 exports.default = _PolygonHtlcService;

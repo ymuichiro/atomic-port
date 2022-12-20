@@ -1,25 +1,17 @@
 import Web3 from "web3";
 import { AbiItem } from "web3-utils";
-import { HashPair } from "../models/CryptoModel";
+import { Contract } from "web3-eth-contract";
 /**
  * Base class for HTLC operations on each EVM
  */
 declare class BaseEvmService {
-    readonly web3: Web3;
-    private readonly contract;
-    private readonly contractId;
+    web3: Web3;
+    protected readonly contract: Contract;
+    readonly contractAddress: string;
     protected constructor(abi: AbiItem, provider: string, contractAddress: string);
     /**
      * Obtain contract information for the current instance
      */
-    getContractInfo(): any;
-    /**
-     * Issue HTLC and obtain the key at the time of issue
-     */
-    mint(recipientAddress: string, senderAddress: string, lockSeconds: number, amount: number, gasLimit: number): Promise<[string, HashPair]>;
-    /**
-     * Receive tokens stored under the key at the time of HTLC generation
-     */
-    withDraw(senderAddress: string, secret: string, gasLimit: number): Promise<string>;
+    getContractInfo(contractId: string): any;
 }
 export default BaseEvmService;

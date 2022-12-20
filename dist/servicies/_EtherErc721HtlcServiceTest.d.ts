@@ -1,12 +1,16 @@
+import Web3 from "web3";
 import { HashPair } from "../models/CryptoModel";
-import BaseEvmService from "./BaseEvmService";
 /**
  * Base class for HTLC operations on each EVM
  */
-declare class _PolygonErc721HtlcService extends BaseEvmService {
-    static readonly provider = "https://rpc-mumbai.maticvigil.com";
-    static readonly contractAddress = "0x6003028E5C3FB11c5F002902dDa1E18cF6a5D34B";
-    constructor(provider?: string, contractAddress?: string);
+declare class _EtherErc721HtlcServiceTest {
+    readonly web3: Web3;
+    private readonly contract;
+    constructor();
+    /**
+     * Obtain contract information for the current instance
+     */
+    getContractInfo(contractId: string): any;
     /**
      * Issue HTLC and obtain the key at the time of issue
      */
@@ -16,4 +20,4 @@ declare class _PolygonErc721HtlcService extends BaseEvmService {
      */
     withDraw(contractId: string, senderAddress: string, secret: string, gasLimit: number): Promise<string>;
 }
-export default _PolygonErc721HtlcService;
+export default _EtherErc721HtlcServiceTest;
