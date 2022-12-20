@@ -30,14 +30,17 @@ class _EtherHtlcService extends BaseEvmService {
     lockSeconds: number,
     amount: number,
     gasLimit: number
-  ): Promise<[string, HashPair]> {
+  ): Promise<object> {
     const hashPair: HashPair = newSecretHashPair();
     const value = this.web3.utils.toWei(this.web3.utils.toBN(amount), "finney");
     const lockPeriod = Math.floor(Date.now() / 1000) + lockSeconds;
     const res = await this.contract.methods
       .newContract(recipientAddress, hashPair.hash, lockPeriod)
       .send({ from: senderAddress, gas: gasLimit.toString(), value });
-    return [res.events.LogHTLCNew.returnValues, hashPair];
+    return {
+      contractId: res.events.LogHTLCNew.returnValues.contractId,
+      hashPair,
+    };
   }
 
   /**

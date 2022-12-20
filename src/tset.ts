@@ -22,9 +22,9 @@ async function htlcTest(){
   const mint = await _etherHtlc.mint(_etherHtlc.web3.eth.accounts.wallet[1].address, _etherHtlc.web3.eth.accounts.wallet[0].address, 3600, 1, GAS);
   console.log("ETH", "HTLC", "mint");
   console.log(mint);
-  const contractId = (mint[0] as any).contractId;
+  const contractId = (mint as any).contractId;
   console.log(await _etherHtlc.getContractInfo(contractId));
-  const draw = await _etherHtlc.withDraw(contractId, _etherHtlc.web3.eth.accounts.wallet[1].address, mint[1].secret, GAS);
+  const draw = await _etherHtlc.withDraw(contractId, _etherHtlc.web3.eth.accounts.wallet[1].address, (mint as any).hashPair.secret, GAS);
   console.log("ETH", "HTLC", "withDraw");
   console.log(draw);
   console.log(await _etherHtlc.getContractInfo(contractId));

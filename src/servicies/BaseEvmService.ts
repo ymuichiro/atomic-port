@@ -13,7 +13,7 @@ class BaseEvmService {
   protected constructor(
     abi: AbiItem,
     provider: string,
-    contractAddress: string
+    contractAddress: string,
   ) {
     this.web3 = new Web3(new Web3.providers.HttpProvider(provider));
     this.contract = new this.web3.eth.Contract(abi, contractAddress);

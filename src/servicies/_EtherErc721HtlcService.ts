@@ -17,7 +17,7 @@ class _EtherErc721HtlcService extends BaseEvmService {
     super(
         HashedTimelockERC721.abi as any,
       provider ?? _EtherErc721HtlcService.provider,
-      contractAddress ?? _EtherErc721HtlcService.contractAddress
+      contractAddress ?? _EtherErc721HtlcService.contractAddress,
     );
   }
 
