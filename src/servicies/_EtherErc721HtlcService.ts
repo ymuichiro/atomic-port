@@ -1,21 +1,18 @@
-import BaseEvmService from "./BaseEvmService";
-import HashedTimelockERC721 from "../abis/HashedTimelockERC721.json";
+import BaseErc721HtlcService from "./BaseErc721HtlcService";
 
 /**
- * HTLC operations on the Ethereum Test Net.
- * Passing a value to the constructor will overwrite the specified value.
+ * Base class for HTLC operations on each EVM
  */
-class _EtherErc721HtlcService extends BaseEvmService {
+class _EtherErc721HtlcService extends BaseErc721HtlcService {
   public static readonly provider =
     "https://sepolia.infura.io/v3/85eb73cb20fc46058b5044657ed33efd";
-  public static readonly contractId =
+  public static readonly contractAddress =
     "0x010f8d96C3D3BbA7b3935da8B20AAB3C9E2F6264";
 
-  constructor(provider?: string, contractId?: string) {
+    constructor(provider?: string, contractAddress?: string) {
     super(
-      HashedTimelockERC721 as any,
       provider ?? _EtherErc721HtlcService.provider,
-      contractId ?? _EtherErc721HtlcService.contractId
+      contractAddress ?? _EtherErc721HtlcService.contractAddress,
     );
   }
 }

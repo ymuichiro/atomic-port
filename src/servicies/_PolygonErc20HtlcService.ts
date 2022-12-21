@@ -1,22 +1,19 @@
-import BaseEvmService from "./BaseEvmService";
-import HashedTimelockERC20 from "../abis/HashedTimelockERC20.json";
+import BaseErc20HtlcService from "./BaseErc20HtlcService";
 
 /**
- * HTLC operations on the Ethereum Test Net.
- * Passing a value to the constructor will overwrite the specified value.
+ * Base class for HTLC operations on each EVM
  */
-class _EtherErc20HtlcService extends BaseEvmService {
+class _PolygonErc20HtlcService extends BaseErc20HtlcService {
   public static readonly provider = "https://rpc-mumbai.maticvigil.com";
-  public static readonly contractId =
+  public static readonly contractAddress =
     "0xa66ffa7b45d9138e6A93bBa1f29a580bd559E5cC";
 
-  constructor(provider?: string, contractId?: string) {
+  constructor(provider?: string, contractAddress?: string) {
     super(
-      HashedTimelockERC20 as any,
-      provider ?? _EtherErc20HtlcService.provider,
-      contractId ?? _EtherErc20HtlcService.contractId
+      provider ?? _PolygonErc20HtlcService.provider,
+      contractAddress ?? _PolygonErc20HtlcService.contractAddress
     );
   }
 }
 
-export default _EtherErc20HtlcService;
+export default _PolygonErc20HtlcService;
