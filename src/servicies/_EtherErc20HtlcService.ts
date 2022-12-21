@@ -9,10 +9,10 @@ class _EtherErc20HtlcService extends BaseErc20HtlcService {
   public static readonly contractAddress =
     "0x13cf057B85085972a2FffdB73E952b1F5E850C0d";
 
-    constructor(provider?: string, contractAddress?: string) {
+  constructor(provider?: string, contractAddress?: string) {
     super(
       provider ?? _EtherErc20HtlcService.provider,
-      contractAddress ?? _EtherErc20HtlcService.contractAddress,
+      contractAddress ?? _EtherErc20HtlcService.contractAddress
     );
   }
 }

@@ -1,85 +1,142 @@
 import { calcCompositeHash, newSecretHashPair } from "../cores/CryptoService";
-import { SymbolFacade } from "symbol-sdk/src/facade/SymbolFacade";
-import { KeyPair } from "symbol-sdk/src/symbol/KeyPair";
-import { NetworkTimestamp } from "symbol-sdk/src/symbol/NetworkTimestamp";
-import { Amount } from "symbol-sdk/src/symbol/models";
-import { converter } from "symbol-sdk/src/utils/converter";
-import { PrivateKey } from "symbol-sdk/src/CryptoTypes";
-import { Network, Address } from "symbol-sdk/src/symbol/Network";
+import {
+  Address,
+  Convert,
+  Deadline,
+  LockHashAlgorithm,
+  Mosaic,
+  MosaicId,
+  NetworkType,
+  RawAddress,
+  SecretLockTransaction,
+  UInt64,
+  RepositoryFactoryHttp,
+  Account,
+  SecretLockInfo,
+  SecretProofTransaction,
+} from "symbol-sdk";
+import { firstValueFrom } from "rxjs";
 
 class SymbolService {
-  private readonly facade: SymbolFacade;
   private readonly node: string;
+  private readonly networkType: NetworkType;
+  private readonly generationHashSeed: string;
+  private readonly currencyMosaicId: string;
+  private readonly epochAdjustment: number;
 
-  constructor(network: Network, node: string) {
-    this.facade = SymbolFacade(network);
+  constructor(
+    node: string,
+    networkType: NetworkType,
+    generationHashSeed: string,
+    currencyMosaicId: string,
+    epochAdjustment: number
+  ) {
     this.node = node;
+    this.networkType = networkType;
+    this.generationHashSeed = generationHashSeed;
+    this.currencyMosaicId = currencyMosaicId;
+    this.epochAdjustment = epochAdjustment;
   }
 
   public async secretLockTransaction(
     senderPrivateKey: string,
     recipientAddress: string,
-    mosaicId: bigint,
-    amount: bigint,
-    duration: bigint
-  ) {
-    this.facade;
-    const privateKey = new PrivateKey(senderPrivateKey);
-    const keyPair = new KeyPair(privateKey);
+    mosaicId: string,
+    amount: number,
+    duration: number
+  ): Promise<object> {
+    const repo = new RepositoryFactoryHttp(this.node);
+    const txRepo = repo.createTransactionRepository();
+    const deadline = Deadline.create(this.epochAdjustment);
     const hashPair = newSecretHashPair();
-    const deadline = new NetworkTimestamp(
-      this.facade.network.fromDatetime(Date.now())
-    ).addHours(2).timestamp;
     const secret = hashPair.hash.toUpperCase().replace("0X", "");
-    const secretLockTransaction = this.facade.transactionFactory.create({
-      type: "secret_lock_transaction_v1",
-      mosaic: { mosaicId, amount },
-      signerPublicKey: keyPair.publicKey,
-      duration,
-      recipientAddress,
-      secret,
-      hashAlgorithm: "hash_256",
-      deadline,
-    });
 
-    const compositeHash = converter.uint8ToHex(
+    const sender = Account.createFromPrivateKey(
+      senderPrivateKey,
+      this.networkType
+    );
+    const secretLockTransaction = SecretLockTransaction.create(
+      deadline,
+      new Mosaic(new MosaicId(mosaicId), UInt64.fromUint(amount)),
+      UInt64.fromUint(duration),
+      LockHashAlgorithm.Op_Hash_256,
+      secret,
+      Address.createFromRawAddress(recipientAddress),
+      this.networkType
+    ).setMaxFee(100);
+
+    const compositeHash = Convert.uint8ToHex(
       this.compositeHash(
-        converter.hexToUint8(secret),
-        new Address(recipientAddress).bytes
+        Convert.hexToUint8(secret),
+        RawAddress.stringToAddress(recipientAddress)
       )
     );
-    secretLockTransaction.fee = new Amount(
-      BigInt(secretLockTransaction.size * 100)
+
+    const signedTransaction = sender.sign(
+      secretLockTransaction,
+      this.generationHashSeed
     );
-    const signature = this.facade.signTransaction(
-      keyPair,
-      secretLockTransaction
-    );
-    const jsonPayload =
-      this.facade.transactionFactory.constructor.attachSignature(
-        secretLockTransaction,
-        signature
-      );
-    const res = await fetch(this.node + "/transactions", {
-      method: "put",
-      body: jsonPayload,
-      headers: { "Content-Type": "application/json" },
-    });
+
+    const res = await firstValueFrom(txRepo.announce(signedTransaction));
     return {
-      message: await res.json(),
+      message: res,
       hashPair,
       compositeHash,
     };
   }
 
-  private async getLockTransaction(compositeHash: number[]): Promise<Response> {
-    return await fetch(this.node + "/lock/secret/" + compositeHash, {
-      method: "get",
-      headers: { "Content-Type": "application/json" },
-    });
+  public async secretProofTransaction(
+    senderPrivateKey: string,
+    recipientAddress: string,
+    proof: string,
+    secret: string
+  ): Promise<object> {
+    const repo = new RepositoryFactoryHttp(this.node);
+    const txRepo = repo.createTransactionRepository();
+    const deadline = Deadline.create(this.epochAdjustment);
+
+    const sender = Account.createFromPrivateKey(
+      senderPrivateKey,
+      this.networkType
+    );
+
+    const secretProofTransaction = SecretProofTransaction.create(
+      deadline,
+      LockHashAlgorithm.Op_Hash_256,
+      secret.replace("0x", ""),
+      Address.createFromRawAddress(recipientAddress),
+      proof.replace("0x", ""),
+      this.networkType
+    ).setMaxFee(100);
+
+    const signedTransaction = sender.sign(
+      secretProofTransaction,
+      this.generationHashSeed
+    );
+
+    const res = await firstValueFrom(txRepo.announce(signedTransaction));
+
+    return {
+      message: res,
+      hashPair: {
+        proof,
+        secret,
+      },
+    };
   }
 
-  private compositeHash = (secret: string, address: string): number[] => {
+  public async getLockTransaction(
+    compositeHash: string
+  ): Promise<SecretLockInfo> {
+    const repo = new RepositoryFactoryHttp(this.node);
+    const secretLockRepo = repo.createSecretLockRepository();
+    return await firstValueFrom(secretLockRepo.getSecretLock(compositeHash));
+  }
+
+  private compositeHash = (
+    secret: Uint8Array,
+    address: Uint8Array
+  ): number[] => {
     return calcCompositeHash(secret, address);
   };
 }
