@@ -3,14 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const _EtherHtlcService_1 = __importDefault(require("./servicies/_EtherHtlcService"));
-const _EtherErc20HtlcService_1 = __importDefault(require("./servicies/_EtherErc20HtlcService"));
-const _EtherErc721HtlcService_1 = __importDefault(require("./servicies/_EtherErc721HtlcService"));
+const _EtherRinkebyHtlcService_1 = __importDefault(require("./servicies/_EtherRinkebyHtlcService"));
+const _EtherRinkebyErc20HtlcService_1 = __importDefault(require("./servicies/_EtherRinkebyErc20HtlcService"));
+const _EtherRinkebyErc721HtlcService_1 = __importDefault(require("./servicies/_EtherRinkebyErc721HtlcService"));
 const ERC721_json_1 = __importDefault(require("./abis/ERC721.json"));
 // eth
-const _etherHtlc = new _EtherHtlcService_1.default();
-const _etherErc20Htlc = new _EtherErc20HtlcService_1.default();
-const _etherErc721Htlc = new _EtherErc721HtlcService_1.default();
+const _etherHtlc = new _EtherRinkebyHtlcService_1.default();
+const _etherErc20Htlc = new _EtherRinkebyErc20HtlcService_1.default();
+const _etherErc721Htlc = new _EtherRinkebyErc721HtlcService_1.default();
 // 以下のアカウントを使ってもらうとERC20トークンなどは持っているので楽かと思います
 const PRIVATE_KEY1 = "09a30c3ffac631be9bf11495819fbaadf036f08a2cc90ae1fde061df2653126c";
 const PRIVATE_KEY2 = "945170294f88dbcba5431dc65130bd8634d5ce30dceaf68d546ba90ca2c50cc2";
@@ -39,7 +39,9 @@ async function htlcTest() {
 }
 // ERC20Cテスト用
 async function erc20Test() {
-    const mint = await _etherErc20Htlc.mint(_etherErc20Htlc.web3.eth.accounts.wallet[1].address, _etherErc20Htlc.web3.eth.accounts.wallet[0].address, 3600, 1, GAS, "0x396810E66B06686A4A10d50b13BA9056b3f73372");
+    const mint = await _etherErc20Htlc.mint(_etherErc20Htlc.web3.eth.accounts.wallet[1].address, _etherErc20Htlc.web3.eth.accounts.wallet[0].address, 3600, 10000, GAS, "0x564e849C68350248B441e1BC592aC8b4e07ef1E9" // JPYC Rinkeby
+    // "0x396810E66B06686A4A10d50b13BA9056b3f73372" // AliceToken
+    );
     console.log("ETH", "ERC20_HTLC", "mint");
     console.log(mint);
     const contractId = mint.contractId;
@@ -92,15 +94,19 @@ async function symbolProof() {
 }
 // テスト実行用
 (async () => {
+    // ここからevm
     // htlcTest();
-    // erc20Test();
+    erc20Test();
     // await createErc721(15);
     // await erc721Test(14);
+    // ここまでevm
+    // ここからsymbol
     // console.log(await symbolLock());
     /* console.log(
       await getLockTransaction(
         "FE22B6622758CFDE3D144DABFCBFB80188A77801E142DACAF0188F3D82E68A5B"
       )
     );*/
-    console.log(await symbolProof());
+    // console.log(await symbolProof());
+    // ここまでsymbol
 })();

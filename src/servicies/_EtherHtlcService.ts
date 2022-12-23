@@ -7,13 +7,13 @@ import BaseHtlcService from "./BaseHtlcService";
 class _EtherHtlcService extends BaseHtlcService {
   public static readonly provider =
     "https://sepolia.infura.io/v3/85eb73cb20fc46058b5044657ed33efd";
-  public static readonly contractId =
+  public static readonly contractAddress =
     "0x822f315505C67727E3bDC89b8ff7a5cEc3dDEBF7";
 
-  constructor(provider?: string, contractId?: string) {
+  constructor(provider?: string, contractAddress?: string) {
     super(
       provider ?? _EtherHtlcService.provider,
-      contractId ?? _EtherHtlcService.contractId
+      contractAddress ?? _EtherHtlcService.contractAddress
     );
   }
 }

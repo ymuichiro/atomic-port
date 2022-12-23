@@ -42,7 +42,7 @@ class SymbolService {
         const signedTransaction = sender.sign(secretProofTransaction, this.generationHashSeed);
         const res = await (0, rxjs_1.firstValueFrom)(txRepo.announce(signedTransaction));
         return {
-            message: await res,
+            message: res,
             hashPair: {
                 proof,
                 secret,

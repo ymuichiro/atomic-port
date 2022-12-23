@@ -1,12 +1,12 @@
-import _EtherHtlcService from "./servicies/_EtherHtlcService";
-import _EtherErc20HtlcService from "./servicies/_EtherErc20HtlcService";
-import _EtherErc721HtlcService from "./servicies/_EtherErc721HtlcService";
+import _EtherRinkebyHtlcService from "./servicies/_EtherRinkebyHtlcService";
+import _EtherRinkebyErc20HtlcService from "./servicies/_EtherRinkebyErc20HtlcService";
+import _EtherRinkebyErc721HtlcService from "./servicies/_EtherRinkebyErc721HtlcService";
 import ERC721Abi from "./abis/ERC721.json";
 
 // eth
-const _etherHtlc = new _EtherHtlcService();
-const _etherErc20Htlc = new _EtherErc20HtlcService();
-const _etherErc721Htlc = new _EtherErc721HtlcService();
+const _etherHtlc = new _EtherRinkebyHtlcService();
+const _etherErc20Htlc = new _EtherRinkebyErc20HtlcService();
+const _etherErc721Htlc = new _EtherRinkebyErc721HtlcService();
 
 // 以下のアカウントを使ってもらうとERC20トークンなどは持っているので楽かと思います
 const PRIVATE_KEY1 =
@@ -56,9 +56,10 @@ async function erc20Test() {
     _etherErc20Htlc.web3.eth.accounts.wallet[1].address,
     _etherErc20Htlc.web3.eth.accounts.wallet[0].address,
     3600,
-    1,
+    10000,
     GAS,
-    "0x396810E66B06686A4A10d50b13BA9056b3f73372"
+    "0x564e849C68350248B441e1BC592aC8b4e07ef1E9" // JPYC Rinkeby
+    // "0x396810E66B06686A4A10d50b13BA9056b3f73372" // AliceToken
   );
   console.log("ETH", "ERC20_HTLC", "mint");
   console.log(mint);
@@ -156,7 +157,7 @@ async function symbolProof() {
 (async () => {
   // ここからevm
   // htlcTest();
-  // erc20Test();
+  erc20Test();
   // await createErc721(15);
   // await erc721Test(14);
   // ここまでevm

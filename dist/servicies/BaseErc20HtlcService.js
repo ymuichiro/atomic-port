@@ -27,14 +27,15 @@ class BaseErc20HtlcService {
         const erc20TokenContract = new this.web3.eth.Contract(ERC20_json_1.default.abi, tokenAddress);
         // ERC20 や ERC721はまず小切手のようにコントラクトアドレスが受け取るための宣言をapproveによって行います
         // approveの第２引数はAmount
+        const value = this.web3.utils.toWei(this.web3.utils.toBN(amount), "finney");
         const approve = await erc20TokenContract.methods
-            .approve(this.contractAddress, amount)
+            .approve(this.contractAddress, value)
             .send({ from: senderAddress, gas: gasLimit.toString() });
         console.log(approve.events.Approval.returnValues);
         const hashPair = (0, CryptoService_1.newSecretHashPair)();
         const lockPeriod = Math.floor(Date.now() / 1000) + lockSeconds;
         const res = await this.contract.methods
-            .newContract(recipientAddress, hashPair.hash, lockPeriod, tokenAddress, amount)
+            .newContract(recipientAddress, hashPair.hash, lockPeriod, tokenAddress, value)
             .send({ from: senderAddress, gas: gasLimit.toString() });
         return {
             contractId: res.events.HTLCERC20New.returnValues.contractId,

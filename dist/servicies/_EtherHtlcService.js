@@ -10,9 +10,9 @@ const BaseHtlcService_1 = __importDefault(require("./BaseHtlcService"));
  */
 class _EtherHtlcService extends BaseHtlcService_1.default {
     static provider = "https://sepolia.infura.io/v3/85eb73cb20fc46058b5044657ed33efd";
-    static contractId = "0x822f315505C67727E3bDC89b8ff7a5cEc3dDEBF7";
-    constructor(provider, contractId) {
-        super(provider ?? _EtherHtlcService.provider, contractId ?? _EtherHtlcService.contractId);
+    static contractAddress = "0x822f315505C67727E3bDC89b8ff7a5cEc3dDEBF7";
+    constructor(provider, contractAddress) {
+        super(provider ?? _EtherHtlcService.provider, contractAddress ?? _EtherHtlcService.contractAddress);
     }
 }
 exports.default = _EtherHtlcService;
