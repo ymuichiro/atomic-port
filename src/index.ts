@@ -1,7 +1,6 @@
-export { HashPair } from "./models/CryptoModel";
-export * from "./servicies/_EtherHtlcService";
-export * from "./servicies/_EtherErc20HtlcService";
-export * from "./servicies/_EtherErc721HtlcService";
-export * from "./servicies/_PolygonHtlcService";
-export * from "./servicies/_PolygonErc20HtlcService";
-export * from "./servicies/_PolygonErc721HtlcService";
+export { Contracts } from './cores/Contracts';
+export * from './servicies/HTLCService';
+export * from './servicies/HTLCERC20Service';
+export * from './servicies/HTLCERC721Service';
+export * from './servicies/HTLCSymbolService';
+export * from './models';

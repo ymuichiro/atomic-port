@@ -14952,39 +14952,17 @@
   "ast": {
     "absolutePath": "project:/contracts/AliceERC721.sol",
     "exportedSymbols": {
-      "Address": [
-        1472
-      ],
-      "AliceERC721": [
-        36
-      ],
-      "Context": [
-        1494
-      ],
-      "ERC165": [
-        1693
-      ],
-      "ERC721": [
-        981
-      ],
-      "IERC165": [
-        1705
-      ],
-      "IERC721": [
-        1097
-      ],
-      "IERC721Metadata": [
-        1142
-      ],
-      "IERC721Receiver": [
-        1115
-      ],
-      "Math": [
-        2570
-      ],
-      "Strings": [
-        1669
-      ]
+      "Address": [1472],
+      "AliceERC721": [36],
+      "Context": [1494],
+      "ERC165": [1693],
+      "ERC721": [981],
+      "IERC165": [1705],
+      "IERC721": [1097],
+      "IERC721Metadata": [1142],
+      "IERC721Receiver": [1115],
+      "Math": [2570],
+      "Strings": [1669]
     },
     "id": 37,
     "license": "MIT",
@@ -14992,12 +14970,7 @@
     "nodes": [
       {
         "id": 1,
-        "literals": [
-          "solidity",
-          "^",
-          "0.8",
-          ".0"
-        ],
+        "literals": ["solidity", "^", "0.8", ".0"],
         "nodeType": "PragmaDirective",
         "src": "32:23:0"
       },
@@ -15020,9 +14993,7 @@
             "baseName": {
               "id": 3,
               "name": "ERC721",
-              "nameLocations": [
-                "156:6:0"
-              ],
+              "nameLocations": ["156:6:0"],
               "nodeType": "IdentifierPath",
               "referencedDeclaration": 981,
               "src": "156:6:0"
@@ -15037,15 +15008,7 @@
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 36,
-        "linearizedBaseContracts": [
-          36,
-          981,
-          1142,
-          1097,
-          1693,
-          1705,
-          1494
-        ],
+        "linearizedBaseContracts": [36, 981, 1142, 1097, 1693, 1705, 1494],
         "name": "AliceERC721",
         "nameLocation": "141:11:0",
         "nodeType": "ContractDefinition",
@@ -15101,9 +15064,7 @@
                 "modifierName": {
                   "id": 6,
                   "name": "ERC721",
-                  "nameLocations": [
-                    "183:6:0"
-                  ],
+                  "nameLocations": ["183:6:0"],
                   "nodeType": "IdentifierPath",
                   "referencedDeclaration": 981,
                   "src": "183:6:0"
