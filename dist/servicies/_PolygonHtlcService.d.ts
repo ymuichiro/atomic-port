@@ -5,7 +5,7 @@ import BaseHtlcService from "./BaseHtlcService";
  */
 declare class _PolygonHtlcService extends BaseHtlcService {
     static readonly provider = "https://rpc-mumbai.maticvigil.com";
-    static readonly contractId = "0x6003028E5C3FB11c5F002902dDa1E18cF6a5D34B";
-    constructor(provider?: string, contractId?: string);
+    static readonly contractAddress = "0x6003028E5C3FB11c5F002902dDa1E18cF6a5D34B";
+    constructor(provider?: string, contractAddress?: string);
 }
 export default _PolygonHtlcService;

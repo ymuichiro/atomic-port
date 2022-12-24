@@ -40,8 +40,9 @@ class BaseErc20HtlcService implements IEvmService {
     );
     // ERC20 や ERC721はまず小切手のようにコントラクトアドレスが受け取るための宣言をapproveによって行います
     // approveの第２引数はAmount
+    const value = this.web3.utils.toWei(this.web3.utils.toBN(amount), "finney");
     const approve = await erc20TokenContract.methods
-      .approve(this.contractAddress, amount)
+      .approve(this.contractAddress, value)
       .send({ from: senderAddress, gas: gasLimit.toString() });
     console.log(approve.events.Approval.returnValues);
     const hashPair: HashPair = newSecretHashPair();
@@ -52,7 +53,7 @@ class BaseErc20HtlcService implements IEvmService {
         hashPair.hash,
         lockPeriod,
         tokenAddress,
-        amount
+        value
       )
       .send({ from: senderAddress, gas: gasLimit.toString() });
     return {

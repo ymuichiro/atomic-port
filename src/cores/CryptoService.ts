@@ -17,7 +17,7 @@ function generateHash(secret: Buffer) {
   return crypto.createHash("sha256").update(secret).digest();
 }
 
-export const calcCompositeHash = (secret: string, address: string) => {
+export const calcCompositeHash = (secret: Uint8Array, address: Uint8Array) => {
   return sha3.create().update(secret).update(address).digest();
 };
 
