@@ -1,26 +1,22 @@
-import Web3 from "web3";
-import { Contract } from "web3-eth-contract";
-import IEvmService from "./IEvmService";
-import HashedTimelockERC20 from "../abis/HashedTimelockERC20.json";
-import ERC20Abi from "../abis/ERC20.json";
-import { newSecretHashPair } from "../cores/CryptoService";
-import { HashPair } from "../models/CryptoModel";
+import Web3 from 'web3';
+import { Contract } from 'web3-eth-contract';
+import HashedTimelockERC20 from '../abis/HashedTimelockERC20.json';
+import ERC20Abi from '../abis/ERC20.json';
+import { MintOptions } from '../models/evm';
+import HashPair from '../cores/HashPair';
 
 /**
  * HTLC operations on the Ethereum Test Net.
  * Passing a value to the constructor will overwrite the specified value.
  */
-class BaseErc20HtlcService implements IEvmService {
+class BaseErc20HtlcService {
   public web3: Web3;
   protected readonly contract: Contract;
   protected readonly contractAddress: string;
 
   protected constructor(provider: string, contractAddress: string) {
     this.web3 = new Web3(new Web3.providers.HttpProvider(provider));
-    this.contract = new this.web3.eth.Contract(
-      HashedTimelockERC20.abi as any,
-      contractAddress
-    );
+    this.contract = new this.web3.eth.Contract(HashedTimelockERC20.abi as any, contractAddress);
     this.contractAddress = contractAddress;
   }
   /**
@@ -29,51 +25,35 @@ class BaseErc20HtlcService implements IEvmService {
   public async mint(
     recipientAddress: string,
     senderAddress: string,
-    lockSeconds: number,
+    hashPair: HashPair,
     amount: number,
-    gasLimit: number,
-    tokenAddress: string
-  ): Promise<object> {
-    const erc20TokenContract = new this.web3.eth.Contract(
-      ERC20Abi.abi as any,
-      tokenAddress
-    );
+    tokenAddress: string,
+    options?: MintOptions
+  ): Promise<string> {
+    const erc20TokenContract = new this.web3.eth.Contract(ERC20Abi.abi as any, tokenAddress);
+    const gas = options?.gasLimit ?? 1000000;
     // ERC20 や ERC721はまず小切手のようにコントラクトアドレスが受け取るための宣言をapproveによって行います
     // approveの第２引数はAmount
-    const value = this.web3.utils.toWei(this.web3.utils.toBN(amount), "finney");
+    const value = this.web3.utils.toWei(this.web3.utils.toBN(amount), 'finney');
     const approve = await erc20TokenContract.methods
       .approve(this.contractAddress, value)
-      .send({ from: senderAddress, gas: gasLimit.toString() });
+      .send({ from: senderAddress, gas: gas.toString() });
     console.log(approve.events.Approval.returnValues);
-    const hashPair: HashPair = newSecretHashPair();
-    const lockPeriod = Math.floor(Date.now() / 1000) + lockSeconds;
+    const lockPeriod = Math.floor(Date.now() / 1000) + (options?.lockSeconds ?? 3600);
     const res = await this.contract.methods
-      .newContract(
-        recipientAddress,
-        hashPair.hash,
-        lockPeriod,
-        tokenAddress,
-        value
-      )
-      .send({ from: senderAddress, gas: gasLimit.toString() });
-    return {
-      contractId: res.events.HTLCERC20New.returnValues.contractId,
-      hashPair,
-    };
+      .newContract(recipientAddress, hashPair.proofForEvm, lockPeriod, tokenAddress, value)
+      .send({ from: senderAddress, gas: gas.toString() });
+    return res.events.HTLCERC20New.returnValues.contractId;
   }
 
   /**
    * Receive tokens stored under the key at the time of HTLC generation
    */
-  public async withDraw(
-    contractId: string,
-    senderAddress: string,
-    secret: string,
-    gasLimit: number
-  ): Promise<string> {
+  public async withDraw(contractId: string, senderAddress: string, secret: string, gasLimit?: number): Promise<string> {
+    const gas = gasLimit ?? 1000000;
     const res = await this.contract.methods
       .withdraw(contractId, secret)
-      .send({ from: senderAddress, gas: gasLimit.toString() });
+      .send({ from: senderAddress, gas: gas.toString() });
     return res.events.HTLCERC20Withdraw;
   }
 

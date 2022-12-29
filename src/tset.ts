@@ -28,9 +28,9 @@ async function htlcTest() {
   const mint = await _etherHtlc.mint(
     _etherHtlc.web3.eth.accounts.wallet[1].address,
     _etherHtlc.web3.eth.accounts.wallet[0].address,
-    3600,
     1,
     GAS
+    3600,
   );
   console.log("ETH", "HTLC", "mint");
   console.log(mint);
@@ -130,15 +130,6 @@ const symbolService = new SymbolService(
   "72C0212E67A08BCE",
   1667250467
 );
-async function symbolLock() {
-  return await symbolService.secretLockTransaction(
-    privateKey,
-    recipientAddress,
-    "72C0212E67A08BCE", // mosaicId
-    1, // amount
-    5760 // duration
-  );
-}
 
 async function getLockTransaction(compositHash: string) {
   return await symbolService.getLockTransaction(compositHash);

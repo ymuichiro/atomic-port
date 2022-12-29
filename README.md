@@ -25,3 +25,10 @@ This package is for HTLC transactions between the EVM blockchain and Symbol.
 | htlc     | 0x6003028E5C3FB11c5F002902dDa1E18cF6a5D34B |
 | htlc20   | 0xa66ffa7b45d9138e6A93bBa1f29a580bd559E5cC |
 | htlc721  | 0x7f83a9aA861Aa428088E9323f722F2390654C614 |
+
+## メモ
+
+- EVM 側の withDraw の引き出し申請者は宛先側でなければ不可
+- EVM 側で最終的に処理が完了したようなメッセージは確認されるが、Wallet の履歴には反映されていない...？
+- Symbol は withDraw が失敗している？
+- EVM 側はいつ署名している？アドレスだけで完結できてしまう？
