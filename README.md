@@ -1,34 +1,82 @@
 # EVM <-> Symbol Swap
 
-This package is for HTLC transactions between the EVM blockchain and Symbol.
+This package is for HTLC transactions between the EVM blockchain and Symbol. Usage and examples are shown below.
+
+## Introduction
+
+Install the necessary libraries
+
+**npm**
+
+```
+npm install --save symbol-sdk@2 web3
+```
+
+**yarn**
+
+```
+yarn add symbol-sdk@2 web3
+```
+
+HTLC issues a secret and key in advance and uses this to issue a secret lock.
+When both parties agree to the transaction, the secret and key are exchanged separately, and the key is used to receive a token.
+This is how the cross-chain swap is performed.
+
+```ts
+const hashPair = new HashPair();
+```
+
+To do a secret lock on the EVM chain side, do the following
+
+```ts
+const client = new HTLCService(Contracts.sepolia.native.endpoint, Contracts.sepolia.native.endpoint);
+const hashPair = new HashPair();
+const AccountService = client.web3.eth.accounts;
+const fromAddress = AccountService.wallet.add(PRIVATEKEY.FROM).address;
+const toAddress = AccountService.wallet.add(PRIVATEKEY.TO).address;
+const contractId = await client.mint(toAddress, fromAddress, hashPair, 1);
+console.log(await client.getContractInfo(contractId));
+```
+
+To do a secret lock on the Symbol chain side, do the following
+
+```ts
+const client = new HTLCSymbolService(
+  Contracts.symbol.testnet.endpoint,
+  NetworkType.TEST_NET,
+  Contracts.symbol.testnet.generationHashSeed,
+  Contracts.symbol.testnet.epochAdjustment
+);
+const tx = client.mint(ADDRESS.RECIPIENT, hashPair, CURRENCY.MOSAIC_ID, 1);
+await client.sign(PRIVATEKEY.FROM, tx);
+console.log(client.getHash(hashPair.secretForSymbol, ADDRESS.RECIPIENT));
+```
+
+To receive tokens on the EVM chain side, do the following
+
+```ts
+await client.withDraw(contractId, toAddress, hashPair.secretForEvm);
+console.log(await client.getContractInfo(contractId));
+```
+
+To receive tokens on the Symbol chain side, do the following
+
+```ts
+const { PRIVATEKEY, ADDRESS } = SYMBOL;
+const drawTx = client.withDraw(ADDRESS.RECIPIENT, hashPair.proofForSymbol, hashPair.secretForSymbol);
+client.sign(PRIVATEKEY.FROM, drawTx).then((e) => {
+  console.log('xym announced', e.message, client.getHash(hashPair.secretForSymbol, ADDRESS.RECIPIENT));
+});
+```
+
+For more detailed examples, please check the sample collection below
+[examples](examples/README.md)
 
 ## Chains
 
-- ethereum
-- polygon
-- symbol
+The following chains are supported
 
-### Configs
-
-#### ETH TESTNET EXAMPLE
-
-| key      | value                                                         |
-| -------- | ------------------------------------------------------------- |
-| provider | https://sepolia.infura.io/v3/85eb73cb20fc46058b5044657ed33efd |
-| htlc     | 0x822f315505C67727E3bDC89b8ff7a5cEc3dDEBF7                    |
-| htlc20   | 0x13cf057B85085972a2FffdB73E952b1F5E850C0d                    |
-| htlc721  | 0x010f8d96C3D3BbA7b3935da8B20AAB3C9E2F6264                    |
-
-| key      | value                                      |
-| -------- | ------------------------------------------ |
-| provider | https://rpc-mumbai.maticvigil.com          |
-| htlc     | 0x6003028E5C3FB11c5F002902dDa1E18cF6a5D34B |
-| htlc20   | 0xa66ffa7b45d9138e6A93bBa1f29a580bd559E5cC |
-| htlc721  | 0x7f83a9aA861Aa428088E9323f722F2390654C614 |
-
-## メモ
-
-- EVM 側の withDraw の引き出し申請者は宛先側でなければ不可
-- EVM 側で最終的に処理が完了したようなメッセージは確認されるが、Wallet の履歴には反映されていない...？
-- Symbol は withDraw が失敗している？
-- EVM 側はいつ署名している？アドレスだけで完結できてしまう？
+- [ethereum](https://ethereum.org/)
+- [polygon](https://polygon.technology/)
+- [jpyc](https://jpyc.jp/)
+- [symbol](https://symbol-community.com/)
