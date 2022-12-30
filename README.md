@@ -1,3 +1,7 @@
+<div align="center">
+<img src="assets/evm-symbol-swap-logo-wide.png" alt="evm-symbol-swap-logo" title="evm-symbol-swap-logo">
+</div>
+
 # EVM <-> Symbol Swap
 
 This package is for HTLC transactions between the EVM blockchain and Symbol. Usage and examples are shown below.
