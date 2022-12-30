@@ -4,7 +4,7 @@ import crypto from 'crypto';
  * create a new hash pair
  * If you specify an existing secret or proof in the constructor, take over that value
  */
-class HashPair {
+export class HashPair {
   private readonly _secret: string;
   private readonly _proof: string;
 
@@ -37,5 +37,3 @@ class HashPair {
     return '0x' + this._secret;
   }
 }
-
-export default HashPair;

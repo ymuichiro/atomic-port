@@ -1,22 +1,19 @@
-import Web3 from 'web3';
-import { Contract } from 'web3-eth-contract';
+import { AbiItem } from 'web3-utils';
 import HashedTimelockERC721 from '../abis/HashedTimelockERC721.json';
 import ERC721Abi from '../abis/ERC721.json';
-import HashPair from '../cores/HashPair';
+import { HashPair } from '../cores/HashPair';
 import { MintOptions } from '../models/evm';
+import { BaseHTLCService } from './BaseHTLCService';
 
 /**
  * HTLC operations on the Ethereum Test Net.
  * Passing a value to the constructor will overwrite the specified value.
  */
-class BaseErc721HtlcService {
-  public web3: Web3;
-  protected readonly contract: Contract;
-  protected readonly contractAddress: string;
+export class HTLCERC721Service extends BaseHTLCService {
+  private readonly contractAddress: string;
 
-  protected constructor(provider: string, contractAddress: string) {
-    this.web3 = new Web3(new Web3.providers.HttpProvider(provider));
-    this.contract = new this.web3.eth.Contract(HashedTimelockERC721.abi as any, contractAddress);
+  constructor(providerEndpoint: string, contractAddress: string) {
+    super(providerEndpoint, contractAddress, HashedTimelockERC721.abi as unknown as AbiItem);
     this.contractAddress = contractAddress;
   }
 
@@ -31,12 +28,13 @@ class BaseErc721HtlcService {
     tokenAddress: string,
     options?: MintOptions
   ): Promise<string> {
+    // Pre-register before issuing a transaction
     const erc721TokenContract = new this.web3.eth.Contract(ERC721Abi.abi as any, tokenAddress);
     const gas = options?.gasLimit ?? 1000000;
-    const approve = await erc721TokenContract.methods
+    await erc721TokenContract.methods
       .approve(this.contractAddress, tokenId)
       .send({ from: senderAddress, gas: gas.toString() });
-    console.log(approve.events.Approval.returnValues);
+    // Issue lock transaction
     const lockPeriod = Math.floor(Date.now() / 1000) + (options?.lockSeconds ?? 3600);
     const res = await this.contract.methods
       .newContract(recipientAddress, hashPair.proofForEvm, lockPeriod, tokenAddress, tokenId)
@@ -54,13 +52,4 @@ class BaseErc721HtlcService {
       .send({ from: senderAddress, gas: gas.toString() });
     return res.events.HTLCERC721Withdraw;
   }
-
-  /**
-   * Obtain contract information for the current instance
-   */
-  public getContractInfo(contractId: string) {
-    return this.contract.methods.getContract(contractId).call();
-  }
 }
-
-export default BaseErc721HtlcService;

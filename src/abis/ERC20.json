@@ -10359,21 +10359,11 @@
   "ast": {
     "absolutePath": "project:/contracts/AliceERC20.sol",
     "exportedSymbols": {
-      "AliceERC20": [
-        28
-      ],
-      "Context": [
-        3324
-      ],
-      "ERC20": [
-        1763
-      ],
-      "IERC20": [
-        1841
-      ],
-      "IERC20Metadata": [
-        1866
-      ]
+      "AliceERC20": [28],
+      "Context": [3324],
+      "ERC20": [1763],
+      "IERC20": [1841],
+      "IERC20Metadata": [1866]
     },
     "id": 29,
     "license": "MIT",
@@ -10381,12 +10371,7 @@
     "nodes": [
       {
         "id": 1,
-        "literals": [
-          "solidity",
-          "^",
-          "0.8",
-          ".0"
-        ],
+        "literals": ["solidity", "^", "0.8", ".0"],
         "nodeType": "PragmaDirective",
         "src": "32:23:0"
       },
@@ -10409,9 +10394,7 @@
             "baseName": {
               "id": 4,
               "name": "ERC20",
-              "nameLocations": [
-                "215:5:0"
-              ],
+              "nameLocations": ["215:5:0"],
               "nodeType": "IdentifierPath",
               "referencedDeclaration": 1763,
               "src": "215:5:0"
@@ -10432,13 +10415,7 @@
         },
         "fullyImplemented": true,
         "id": 28,
-        "linearizedBaseContracts": [
-          28,
-          1763,
-          1866,
-          1841,
-          3324
-        ],
+        "linearizedBaseContracts": [28, 1763, 1866, 1841, 3324],
         "name": "AliceERC20",
         "nameLocation": "201:10:0",
         "nodeType": "ContractDefinition",
@@ -10707,9 +10684,7 @@
                 "modifierName": {
                   "id": 15,
                   "name": "ERC20",
-                  "nameLocations": [
-                    "301:5:0"
-                  ],
+                  "nameLocations": ["301:5:0"],
                   "nodeType": "IdentifierPath",
                   "referencedDeclaration": 1763,
                   "src": "301:5:0"

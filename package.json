@@ -1,14 +1,33 @@
 {
   "name": "evm-symbol-swap",
-  "version": "1.0.0",
-  "description": "",
-  "main": "./dist/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
+  "version": "0.0.1",
+  "description": "Cross-chain swap by HTLC between EVM-based blockchain and others",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
   "license": "MIT",
+  "author": "Symbol",
+  "private": false,
+  "scripts": {
+    "build": "npm run pre-build && npx tsc && npx tsc -p tsconfig.esm.json",
+    "pre-build": "eslint './src/**/*.{ts, js, json}' && prettier --write src"
+  },
+  "keywords": [
+    "ethereum",
+    "symbol",
+    "htlc",
+    "cross-chain-swap"
+  ],
+  "contributors": [
+    "faunsu19000",
+    "0x070696E65"
+  ],
+  "files": [
+    "dist",
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json"
+  ],
   "dependencies": {
     "symbol-sdk": "^2.0.3",
     "typescript": "^4.9.4",

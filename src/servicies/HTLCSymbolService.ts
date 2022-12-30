@@ -13,13 +13,13 @@ import { Address } from 'symbol-sdk/dist/src/model/account/Address';
 import { Convert } from 'symbol-sdk/dist/src/core/format/Convert';
 import { SecretLockInfo } from 'symbol-sdk/dist/src/model/lock/SecretLockInfo';
 import { SecretProofTransaction } from 'symbol-sdk/dist/src/model/transaction/SecretProofTransaction';
-import HashPair from '../cores/HashPair';
+import { HashPair } from '../cores/HashPair';
 import { sha3_256 as sha3 } from 'js-sha3';
 import { TransactionAnnounceResponse } from 'symbol-sdk/dist/src/model/transaction/TransactionAnnounceResponse';
 import { RawAddress } from 'symbol-sdk/dist/src/core/format/RawAddress';
 import { Transaction } from 'symbol-sdk/dist/src/model/transaction/Transaction';
 
-class SymbolService {
+class HTLCSymbolService {
   private readonly node: string;
   private readonly networkType: NetworkType;
   private readonly generationHashSeed: string;
@@ -100,4 +100,4 @@ class SymbolService {
   }
 }
 
-export default SymbolService;
+export default HTLCSymbolService;
