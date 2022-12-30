@@ -10,8 +10,8 @@ export function createHashPairForEvm(): HashPair {
   const p1 = crypto.createHash('sha256').update(s).digest();
   const p2 = crypto.createHash('sha256').update(p1).digest();
   return {
-    proof: '0x' + p2.toString('hex'),
-    secret: '0x' + s.toString('hex'),
+    proof: '0x' + s.toString('hex'),
+    secret: '0x' + p2.toString('hex'),
   };
 }
 
@@ -24,7 +24,7 @@ export function createHashPairForSymbol(): HashPair {
   const p1 = crypto.createHash('sha256').update(s).digest();
   const p2 = crypto.createHash('sha256').update(p1).digest();
   return {
-    proof: p2.toString('hex').toUpperCase(),
-    secret: s.toString('hex').toUpperCase(),
+    proof: s.toString('hex').toUpperCase(),
+    secret: p2.toString('hex').toUpperCase(),
   };
 }

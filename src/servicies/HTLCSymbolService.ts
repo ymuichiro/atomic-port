@@ -71,7 +71,7 @@ class HTLCSymbolService {
     const senderAccount = Account.createFromPrivateKey(senderPrivateKey, this.networkType);
     const signedTransaction = senderAccount.sign(tx, this.generationHashSeed);
     const txRepo = new RepositoryFactoryHttp(this.node).createTransactionRepository();
-    console.log(await firstValueFrom(txRepo.announce(signedTransaction)).catch((e) => console.error(e)));
+    await firstValueFrom(txRepo.announce(signedTransaction));
     return signedTransaction;
   }
 
