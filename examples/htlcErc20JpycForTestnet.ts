@@ -1,13 +1,14 @@
-import { ETH, SYMBOL } from './config';
+import { ETH } from './config';
 import { NetworkType } from 'symbol-sdk/dist/src/model/network/NetworkType';
 import { HTLCERC20Service } from '../src/servicies/HTLCERC20Service';
 import HTLCSymbolService from '../src/servicies/HTLCSymbolService';
 import { HashPair } from '../src/cores/HashPair';
 import { Contracts } from '../src/cores/Contracts';
+import { xymMint, xymWithDraw } from './htlcSymbolTestNet';
 
 function clients() {
   return {
-    evmClient: new HTLCERC20Service(Contracts.sepolia.erc20.endpoint, Contracts.sepolia.erc20.endpoint),
+    evmClient: new HTLCERC20Service(Contracts.sepolia.erc20.endpoint, Contracts.sepolia.erc20.contractAddress),
     xymClient: new HTLCSymbolService(
       Contracts.symbol.testnet.endpoint,
       NetworkType.TEST_NET,
@@ -32,21 +33,6 @@ async function evmMint(client: HTLCERC20Service, hashPair: HashPair) {
 async function evmWithDraw(client: HTLCERC20Service, contractId: string, toAddress: string, hashPair: HashPair) {
   await client.withDraw(contractId, toAddress, hashPair.secretForEvm);
   console.log(await client.getContractInfo(contractId));
-}
-
-async function xymMint(client: HTLCSymbolService, hashPair: HashPair) {
-  const { PRIVATEKEY, ADDRESS, CURRENCY } = SYMBOL;
-  const tx = client.mint(ADDRESS.RECIPIENT, hashPair, CURRENCY.MOSAIC_ID, 1);
-  await client.sign(PRIVATEKEY.FROM, tx);
-  return client.getHash(hashPair.secretForSymbol, ADDRESS.RECIPIENT);
-}
-
-async function xymWithDraw(client: HTLCSymbolService, hashPair: HashPair) {
-  const { PRIVATEKEY, ADDRESS } = SYMBOL;
-  const drawTx = client.withDraw(ADDRESS.RECIPIENT, hashPair.proofForSymbol, hashPair.secretForSymbol);
-  client.sign(PRIVATEKEY.FROM, drawTx).then((e) => {
-    console.log('xym announced', e.message, client.getHash(hashPair.secretForSymbol, ADDRESS.RECIPIENT));
-  });
 }
 
 // flow

@@ -15,9 +15,9 @@ import { SecretLockInfo } from 'symbol-sdk/dist/src/model/lock/SecretLockInfo';
 import { SecretProofTransaction } from 'symbol-sdk/dist/src/model/transaction/SecretProofTransaction';
 import { HashPair } from '../cores/HashPair';
 import { sha3_256 as sha3 } from 'js-sha3';
-import { TransactionAnnounceResponse } from 'symbol-sdk/dist/src/model/transaction/TransactionAnnounceResponse';
 import { RawAddress } from 'symbol-sdk/dist/src/core/format/RawAddress';
 import { Transaction } from 'symbol-sdk/dist/src/model/transaction/Transaction';
+import { SignedTransaction } from 'symbol-sdk/dist/src/model/transaction/SignedTransaction';
 
 class HTLCSymbolService {
   private readonly node: string;
@@ -73,11 +73,12 @@ class HTLCSymbolService {
   /**
    * sign & accounce
    */
-  public async sign(senderPrivateKey: string, tx: Transaction): Promise<TransactionAnnounceResponse> {
+  public async sign(senderPrivateKey: string, tx: Transaction): Promise<SignedTransaction> {
     const senderAccount = Account.createFromPrivateKey(senderPrivateKey, this.networkType);
     const signedTransaction = senderAccount.sign(tx, this.generationHashSeed);
     const txRepo = new RepositoryFactoryHttp(this.node).createTransactionRepository();
-    return await firstValueFrom(txRepo.announce(signedTransaction));
+    await firstValueFrom(txRepo.announce(signedTransaction));
+    return signedTransaction;
   }
 
   /**

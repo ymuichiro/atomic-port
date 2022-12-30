@@ -8,6 +8,7 @@ export namespace Contracts {
     generationHashSeed: string;
     epochAdjustment: number;
     endpoint: string;
+    websocket: string;
   }
 
   export namespace sepolia {
@@ -60,6 +61,7 @@ export namespace Contracts {
       generationHashSeed: '49D6E1CE276A85B70EAFE52349AACCA389302E7A9754BCF1221E79494FC665A4',
       epochAdjustment: 1667250467,
       endpoint: 'https://mikun-testnet.tk:3001',
+      websocket: 'wss://mikun-testnet.tk:3001/ws',
     };
   }
 }
