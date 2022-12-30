@@ -1,8 +1,8 @@
 import { AbiItem } from 'web3-utils';
 import ERC20Abi from '../abis/ERC20.json';
 import HashedTimelockERC20 from '../abis/HashedTimelockERC20.json';
-import { HashPair } from '../cores/HashPair';
-import { MintOptions } from '../models/evm';
+import { createHashPairForEvm } from '../cores/HashPair';
+import { MintOptions } from '../models/core';
 import { BaseHTLCService } from './BaseHTLCService';
 
 /**
@@ -23,11 +23,10 @@ export class HTLCERC20Service extends BaseHTLCService {
   public async mint(
     recipientAddress: string,
     senderAddress: string,
-    hashPair: HashPair,
     amount: number,
     tokenAddress: string,
     options?: MintOptions
-  ): Promise<string> {
+  ) {
     // Pre-register before issuing a transaction
     const erc20TokenContract = new this.web3.eth.Contract(ERC20Abi.abi as any, tokenAddress);
     const gas = options?.gasLimit ?? 1000000;
@@ -37,10 +36,11 @@ export class HTLCERC20Service extends BaseHTLCService {
       .send({ from: senderAddress, gas: gas.toString() });
     // Issue lock transaction
     const lockPeriod = Math.floor(Date.now() / 1000) + (options?.lockSeconds ?? 3600);
+    const hashPair = createHashPairForEvm();
     const res = await this.contract.methods
-      .newContract(recipientAddress, hashPair.proofForEvm, lockPeriod, tokenAddress, value)
+      .newContract(recipientAddress, hashPair.proof, lockPeriod, tokenAddress, value)
       .send({ from: senderAddress, gas: gas.toString() });
-    return res.events.HTLCERC20New.returnValues.contractId;
+    return { contractId: res.events.HTLCERC20New.returnValues.contractId, hashPair };
   }
 
   /**

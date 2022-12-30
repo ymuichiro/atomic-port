@@ -1,7 +1,7 @@
 import { AbiItem } from 'web3-utils';
 import HashedTimelockAbi from '../abis/HashedTimelock.json';
-import { HashPair } from '../cores/HashPair';
-import { MintOptions } from '../models/evm';
+import { createHashPairForEvm } from '../cores/HashPair';
+import { MintOptions } from '../models/core';
 import { BaseHTLCService } from './BaseHTLCService';
 
 /**
@@ -16,20 +16,15 @@ export class HTLCService extends BaseHTLCService {
   /**
    * Issue HTLC and obtain the key at the time of issue
    */
-  public async mint(
-    recipientAddress: string,
-    senderAddress: string,
-    hashPair: HashPair,
-    amount: number,
-    options?: MintOptions
-  ): Promise<string> {
+  public async mint(recipientAddress: string, senderAddress: string, amount: number, options?: MintOptions) {
+    const hashPair = createHashPairForEvm();
     const value = this.web3.utils.toWei(this.web3.utils.toBN(amount), 'finney');
     const lockPeriod = Math.floor(Date.now() / 1000) + (options?.lockSeconds ?? 3600);
     const gas = options?.gasLimit ?? 1000000;
     const res = await this.contract.methods
-      .newContract(recipientAddress, hashPair.proofForEvm, lockPeriod)
+      .newContract(recipientAddress, hashPair.proof, lockPeriod)
       .send({ from: senderAddress, gas: gas.toString(), value });
-    return res.events.LogHTLCNew.returnValues.contractId;
+    return { contractId: res.events.LogHTLCNew.returnValues.contractId, hashPair };
   }
 
   /**
