@@ -1,4 +1,3 @@
-// import { calcCompositeHash, newSecretHashPair } from '../cores/CryptoService';
 import { firstValueFrom } from 'rxjs';
 import { NetworkType } from 'symbol-sdk/dist/src/model/network/NetworkType';
 import { RepositoryFactoryHttp } from 'symbol-sdk/dist/src/infrastructure/RepositoryFactoryHttp';

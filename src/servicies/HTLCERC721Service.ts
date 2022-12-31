@@ -4,6 +4,7 @@ import ERC721Abi from '../abis/ERC721.json';
 import { MintOptions } from '../models/core';
 import { BaseHTLCService } from './BaseHTLCService';
 import { createHashPairForEvm } from '../cores/HashPair';
+import { HTLCERC721MintResult, HTLCERC721WithDrawResult } from '../models/HTLCERC721';
 
 /**
  * HTLC operations on the Ethereum Test Net.
@@ -39,17 +40,31 @@ export class HTLCERC721Service extends BaseHTLCService {
     const res = await this.contract.methods
       .newContract(recipientAddress, hashPair.proof, lockPeriod, tokenAddress, tokenId)
       .send({ from: senderAddress, gas: gas.toString() });
-    return { contractId: res.events.HTLCERC721New.returnValues.contractId, hashPair };
+    return { result: res as HTLCERC721MintResult, hashPair };
   }
 
   /**
    * Receive tokens stored under the key at the time of HTLC generation
    */
-  public async withDraw(contractId: string, senderAddress: string, secret: string, gasLimit?: number): Promise<string> {
+  public async withDraw(contractId: string, senderAddress: string, secret: string, gasLimit?: number) {
     const gas = gasLimit ?? 1000000;
     const res = await this.contract.methods
       .withdraw(contractId, secret)
       .send({ from: senderAddress, gas: gas.toString() });
-    return res.events.HTLCERC721Withdraw;
+    return { result: res as HTLCERC721WithDrawResult };
+  }
+
+  /**
+   * for development
+   * create erc721 token
+   */
+  public async createToken(tokenAddress: string, senderAddress: string, tokenId: number) {
+    const erc721TokenContract = new this.web3.eth.Contract(ERC721Abi.abi as any, tokenAddress);
+    const res = await erc721TokenContract.methods
+      .mint(senderAddress, tokenId)
+      .send({ from: senderAddress, gas: (1000000).toString() });
+    return {
+      tokenId: res.events.Transfer.returnValues.tokenId as string,
+    };
   }
 }

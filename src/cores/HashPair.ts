@@ -10,8 +10,8 @@ export function createHashPairForEvm(): HashPair {
   const p1 = crypto.createHash('sha256').update(s).digest();
   const p2 = crypto.createHash('sha256').update(p1).digest();
   return {
-    proof: '0x' + s.toString('hex'),
-    secret: '0x' + p2.toString('hex'),
+    proof: '0x' + p2.toString('hex'),
+    secret: '0x' + s.toString('hex'),
   };
 }
 

@@ -1,30 +1,15 @@
-import { Transaction, RepositoryFactoryHttp, Account, NetworkType } from 'symbol-sdk';
+import { Transaction, RepositoryFactoryHttp, Account, NetworkType, Address } from 'symbol-sdk';
 import { Contracts } from '../src/cores/Contracts';
-import { HashPair } from '../src/models/core';
 import HTLCSymbolService from '../src/servicies/HTLCSymbolService';
 import { SYMBOL } from './config';
 
-const recipientAccount = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.TO, NetworkType.TEST_NET);
-const senderAccount = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.FROM, NetworkType.TEST_NET);
-
-const waitConfirmedTransaction = async (privateKey: string, hash: string) => {
+const waitConfirmedTransaction = async (fromAddress: Address, hash: string) => {
   const repositoryFactory = new RepositoryFactoryHttp(Contracts.symbol.testnet.endpoint);
   const listener = repositoryFactory.createListener();
-  const address = Account.createFromPrivateKey(privateKey, NetworkType.TEST_NET).address;
   return new Promise<Transaction>((ok, ng) => {
     listener.open().then(() => {
       listener.newBlock();
-      listener.status(address, hash).subscribe({
-        next: (v) => {
-          console.log('status', v);
-          listener.close();
-        },
-        error: (err) => {
-          console.error('status', err);
-          listener.close();
-        },
-      });
-      listener.confirmed(address, hash).subscribe({
+      listener.confirmed(fromAddress, hash).subscribe({
         next: (v) => {
           console.log('Announcement approved');
           listener.close();
@@ -40,40 +25,33 @@ const waitConfirmedTransaction = async (privateKey: string, hash: string) => {
   });
 };
 
-async function mint(client: HTLCSymbolService) {
-  const { hashPair, transaction } = client.mint(recipientAccount.address.plain(), SYMBOL.CURRENCY.MOSAIC_ID, 1);
-  const signedTx = await client.sign(SYMBOL.PRIVATEKEY.FROM, transaction);
-  console.log('\n', '-'.repeat(5), 'wait until transaction is approved', '-'.repeat(5));
-  console.log('From', senderAccount.address.pretty());
-  console.log('To', recipientAccount.address.pretty());
-  console.log('waiting...', signedTx.hash);
-  await waitConfirmedTransaction(SYMBOL.PRIVATEKEY.FROM, signedTx.hash);
-  return { signedTx, hashPair };
-}
-
-async function withDraw(client: HTLCSymbolService, hashPair: HashPair) {
-  const address = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.TO, NetworkType.TEST_NET).address;
-  const drawTx = client.withDraw(address.plain(), hashPair.proof, hashPair.secret);
-  const signedTx = await client.sign(SYMBOL.PRIVATEKEY.TO, drawTx);
-  console.log('waiting...', signedTx.hash);
-  await waitConfirmedTransaction(SYMBOL.PRIVATEKEY.TO, signedTx.hash);
-  console.log(signedTx);
-}
-
-// flow
 (async () => {
+  // setup
   const client = new HTLCSymbolService(
     Contracts.symbol.testnet.endpoint,
     NetworkType.TEST_NET,
     Contracts.symbol.testnet.generationHashSeed,
     Contracts.symbol.testnet.epochAdjustment
   );
-  const { hashPair, signedTx } = await mint(client);
-  console.log('\n', '-'.repeat(5), 'Lock transaction enlistment completed', '-'.repeat(5));
-  console.log('> xym transaction hash', signedTx.hash);
-  console.log('proof', hashPair.proof, '\nsecret', hashPair.secret);
-  console.log('\n', '-'.repeat(5), 'Start withDraws', '-'.repeat(5));
+  const recipientAccount = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.TO, NetworkType.TEST_NET);
+  const senderAccount = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.FROM, NetworkType.TEST_NET);
+  // mint
+  const { hashPair, transaction } = client.mint(recipientAccount.address.plain(), SYMBOL.CURRENCY.MOSAIC_ID, 1);
+  const signedTx = await client.sign(SYMBOL.PRIVATEKEY.FROM, transaction);
+  console.log('----- wait until transaction is approved -----', {
+    fromAddress: senderAccount.address.pretty(),
+    toAddress: recipientAccount.address.pretty(),
+    transactionHash: signedTx.hash,
+    proof: hashPair.proof,
+    secret: hashPair.secret,
+  });
+  // Wait for secret transaction to be approved
+  await waitConfirmedTransaction(senderAccount.address, signedTx.hash);
   setTimeout(async () => {
-    await withDraw(client, hashPair);
-  }, 3 * 1000);
+    const drawTx = client.withDraw(recipientAccount.address.plain(), hashPair.proof, hashPair.secret);
+    const signedTx = await client.sign(recipientAccount.privateKey, drawTx);
+    console.log('waiting...', signedTx.hash);
+    await waitConfirmedTransaction(recipientAccount.address, signedTx.hash);
+    console.log(signedTx);
+  }, 3000);
 })();

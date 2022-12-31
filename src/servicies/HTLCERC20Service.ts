@@ -3,6 +3,7 @@ import ERC20Abi from '../abis/ERC20.json';
 import HashedTimelockERC20 from '../abis/HashedTimelockERC20.json';
 import { createHashPairForEvm } from '../cores/HashPair';
 import { MintOptions } from '../models/core';
+import { HTLCERC20MintResult, HTLCERC20WithDrawResult } from '../models/HTLCERC20';
 import { BaseHTLCService } from './BaseHTLCService';
 
 /**
@@ -40,17 +41,17 @@ export class HTLCERC20Service extends BaseHTLCService {
     const res = await this.contract.methods
       .newContract(recipientAddress, hashPair.proof, lockPeriod, tokenAddress, value)
       .send({ from: senderAddress, gas: gas.toString() });
-    return { contractId: res.events.HTLCERC20New.returnValues.contractId, hashPair };
+    return { result: res as HTLCERC20MintResult, hashPair };
   }
 
   /**
    * Receive tokens stored under the key at the time of HTLC generation
    */
-  public async withDraw(contractId: string, senderAddress: string, secret: string, gasLimit?: number): Promise<string> {
+  public async withDraw(contractId: string, senderAddress: string, secret: string, gasLimit?: number) {
     const gas = gasLimit ?? 1000000;
     const res = await this.contract.methods
       .withdraw(contractId, secret)
       .send({ from: senderAddress, gas: gas.toString() });
-    return res.events.HTLCERC20Withdraw;
+    return { result: res as HTLCERC20WithDrawResult };
   }
 }

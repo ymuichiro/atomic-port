@@ -2,6 +2,7 @@ import { AbiItem } from 'web3-utils';
 import HashedTimelockAbi from '../abis/HashedTimelock.json';
 import { createHashPairForEvm } from '../cores/HashPair';
 import { MintOptions } from '../models/core';
+import { HTLCMintResult, HTLCWithDrawResult } from '../models/HTLC';
 import { BaseHTLCService } from './BaseHTLCService';
 
 /**
@@ -21,20 +22,20 @@ export class HTLCService extends BaseHTLCService {
     const value = this.web3.utils.toWei(this.web3.utils.toBN(amount), 'finney');
     const lockPeriod = Math.floor(Date.now() / 1000) + (options?.lockSeconds ?? 3600);
     const gas = options?.gasLimit ?? 1000000;
-    const res = await this.contract.methods
+    const result = await this.contract.methods
       .newContract(recipientAddress, hashPair.proof, lockPeriod)
       .send({ from: senderAddress, gas: gas.toString(), value });
-    return { contractId: res.events.LogHTLCNew.returnValues.contractId, hashPair };
+    return { result: result as HTLCMintResult, hashPair };
   }
 
   /**
    * Receive tokens stored under the key at the time of HTLC generation
    */
-  public async withDraw(contractId: string, senderAddress: string, secret: string, gasLimit?: number): Promise<string> {
+  public async withDraw(contractId: string, senderAddress: string, secret: string, gasLimit?: number) {
     const gas = gasLimit ?? 1000000;
-    const res = await this.contract.methods
+    const result = await this.contract.methods
       .withdraw(contractId, secret)
       .send({ from: senderAddress, gas: gas.toString() });
-    return res.events.LogHTLCWithdraw;
+    return { result: result as HTLCWithDrawResult };
   }
 }

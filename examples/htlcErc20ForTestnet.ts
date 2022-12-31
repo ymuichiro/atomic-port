@@ -1,33 +1,28 @@
 import { ETH } from './config';
 import { HTLCERC20Service } from '../src/servicies/HTLCERC20Service';
 import { Contracts } from '../src/cores/Contracts';
-import { HashPair } from '../src/models/core';
 
-async function mint(client: HTLCERC20Service) {
+(async () => {
+  // setup
   const { PRIVATEKEY, TOKEN } = ETH;
+  const client = new HTLCERC20Service(Contracts.sepolia.erc20.endpoint, Contracts.sepolia.erc20.contractAddress);
   const AccountService = client.web3.eth.accounts;
   const fromAddress = AccountService.wallet.add(PRIVATEKEY.FROM).address;
   const toAddress = AccountService.wallet.add(PRIVATEKEY.TO).address;
-  console.log('evm from:', fromAddress);
-  console.log('evm to  :', toAddress);
-  const { contractId, hashPair } = await client.mint(toAddress, fromAddress, 1, TOKEN.ALICE);
-  console.log(await client.getContractInfo(contractId));
-  return { toAddress, contractId, hashPair };
-}
-
-async function withDraw(client: HTLCERC20Service, contractId: string, toAddress: string, hashPair: HashPair) {
-  await client.withDraw(contractId, toAddress, hashPair.secret);
-  console.log(await client.getContractInfo(contractId));
-}
-
-// flow
-(async () => {
+  // mint
+  const { result, hashPair } = await client.mint(toAddress, fromAddress, 1, TOKEN.ALICE);
+  console.log('----- Lock transaction enlistment completed -----', {
+    fromAddress: fromAddress,
+    toAddress: toAddress,
+    contractId: result.events.HTLCERC20New.returnValues.contractId,
+    transactionHash: result.transactionHash,
+    proof: hashPair.proof,
+    secret: hashPair.secret,
+    contractInfo: await client.getContractInfo(result.events.HTLCERC20New.returnValues.contractId),
+  });
   // issue
-  const client = new HTLCERC20Service(Contracts.sepolia.erc20.endpoint, Contracts.sepolia.erc20.contractAddress);
-  const { contractId, hashPair, toAddress } = await mint(client);
-  console.log('-'.repeat(5), 'Lock transaction enlistment completed', '-'.repeat(5));
-  console.log('\n> evm contract id', contractId);
-  console.log('proof', hashPair.proof, '\nsecret', hashPair.secret);
-  console.log('-'.repeat(5), 'Start withDraws', '-'.repeat(5));
-  withDraw(client, contractId, toAddress, hashPair);
+  const res = await client.withDraw(result.events.HTLCERC20New.returnValues.contractId, toAddress, hashPair.secret);
+  console.log('----- Start withDraws -----');
+  console.log('withDraw', `https://sepolia.etherscan.io/tx/${res.result.transactionHash}`);
+  console.log(await client.getContractInfo(res.result.events.HTLCERC20Withdraw.returnValues.contractId));
 })();
