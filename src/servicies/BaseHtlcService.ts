@@ -21,4 +21,14 @@ export class BaseHTLCService {
   public getContractInfo(contractId: string) {
     return this.contract.methods.getContract(contractId).call();
   }
+
+  /**
+   * Called by the sender if there was no withdraw AND the time lock has
+   * expired. This will refund the contract amount.
+   */
+  public refund(contractId: string, senderAddress: string, gasLimit?: number) {
+    const gas = gasLimit ?? 1000000;
+    return this.contract.methods.refund(contractId)
+    .send({ from: senderAddress, gas: gas.toString() });
+  }
 }
