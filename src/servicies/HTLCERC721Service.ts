@@ -38,7 +38,7 @@ export class HTLCERC721Service extends BaseHTLCService {
     const lockPeriod = Math.floor(Date.now() / 1000) + (options?.lockSeconds ?? 3600);
     const hashPair = createHashPairForEvm();
     const res = await this.contract.methods
-      .newContract(recipientAddress, hashPair.proof, lockPeriod, tokenAddress, tokenId)
+      .newContract(recipientAddress, hashPair.secret, lockPeriod, tokenAddress, tokenId)
       .send({ from: senderAddress, gas: gas.toString() });
     return { result: res as HTLCERC721MintResult, hashPair };
   }
@@ -46,10 +46,10 @@ export class HTLCERC721Service extends BaseHTLCService {
   /**
    * Receive tokens stored under the key at the time of HTLC generation
    */
-  public async withDraw(contractId: string, senderAddress: string, secret: string, gasLimit?: number) {
+  public async withDraw(contractId: string, senderAddress: string, proof: string, gasLimit?: number) {
     const gas = gasLimit ?? 1000000;
     const res = await this.contract.methods
-      .withdraw(contractId, secret)
+      .withdraw(contractId, proof)
       .send({ from: senderAddress, gas: gas.toString() });
     return { result: res as HTLCERC721WithDrawResult };
   }

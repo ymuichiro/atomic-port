@@ -21,7 +21,7 @@ import { Contracts } from '../src/cores/Contracts';
     contractInfo: await client.getContractInfo(result.events.HTLCERC20New.returnValues.contractId),
   });
   // issue
-  const res = await client.withDraw(result.events.HTLCERC20New.returnValues.contractId, toAddress, hashPair.secret);
+  const res = await client.withDraw(result.events.HTLCERC20New.returnValues.contractId, toAddress, hashPair.proof);
   console.log('----- Start withDraws -----');
   console.log('withDraw', `https://mumbai.polygonscan.com/tx/${res.result.transactionHash}`);
   console.log(await client.getContractInfo(res.result.events.HTLCERC20Withdraw.returnValues.contractId));

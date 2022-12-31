@@ -23,7 +23,7 @@ export class HTLCService extends BaseHTLCService {
     const lockPeriod = Math.floor(Date.now() / 1000) + (options?.lockSeconds ?? 3600);
     const gas = options?.gasLimit ?? 1000000;
     const result = await this.contract.methods
-      .newContract(recipientAddress, hashPair.proof, lockPeriod)
+      .newContract(recipientAddress, hashPair.secret, lockPeriod)
       .send({ from: senderAddress, gas: gas.toString(), value });
     return { result: result as HTLCMintResult, hashPair };
   }
@@ -31,10 +31,10 @@ export class HTLCService extends BaseHTLCService {
   /**
    * Receive tokens stored under the key at the time of HTLC generation
    */
-  public async withDraw(contractId: string, senderAddress: string, secret: string, gasLimit?: number) {
+  public async withDraw(contractId: string, senderAddress: string, proof: string, gasLimit?: number) {
     const gas = gasLimit ?? 1000000;
     const result = await this.contract.methods
-      .withdraw(contractId, secret)
+      .withdraw(contractId, proof)
       .send({ from: senderAddress, gas: gas.toString() });
     return { result: result as HTLCWithDrawResult };
   }

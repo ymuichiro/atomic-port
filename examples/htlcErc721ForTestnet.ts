@@ -24,7 +24,7 @@ import { Contracts } from '../src/cores/Contracts';
     contractInfo: await client.getContractInfo(result.events.HTLCERC721New.returnValues.contractId),
   });
   // issue
-  const res = await client.withDraw(result.events.HTLCERC721New.returnValues.contractId, toAddress, hashPair.secret);
+  const res = await client.withDraw(result.events.HTLCERC721New.returnValues.contractId, toAddress, hashPair.proof);
   console.log('----- Start withDraws -----');
   console.log('withDraw', `https://sepolia.etherscan.io/tx/${res.result.transactionHash}`);
   console.log(await client.getContractInfo(res.result.events.HTLCERC721Withdraw.returnValues.contractId));
