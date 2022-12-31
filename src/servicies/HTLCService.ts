@@ -3,7 +3,7 @@ import HashedTimelockAbi from '../abis/HashedTimelock.json';
 import { createHashPairForEvm } from '../cores/HashPair';
 import { MintOptions } from '../models/core';
 import { HTLCMintResult, HTLCWithDrawResult } from '../models/HTLC';
-import { BaseHTLCService } from './BaseHTLCService';
+import { BaseHTLCService } from './BaseHtlcService';
 
 /**
  * HTLC operations on the Ethereum Test Net.
