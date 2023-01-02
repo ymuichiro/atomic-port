@@ -1,5 +1,5 @@
 import { Transaction, RepositoryFactoryHttp, Account, NetworkType, Address } from 'symbol-sdk';
-import { Contracts } from '../src/cores/Contracts';
+import { Contracts } from '../src/models/Contracts';
 import HTLCSymbolService from '../src/servicies/HTLCSymbolService';
 import { SYMBOL } from './config';
 
@@ -35,8 +35,9 @@ const waitConfirmedTransaction = async (fromAddress: Address, hash: string) => {
   );
   const recipientAccount = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.TO, NetworkType.TEST_NET);
   const senderAccount = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.FROM, NetworkType.TEST_NET);
+  const hashPair = client.createHashPair();
   // mint
-  const { hashPair, transaction } = client.mint(recipientAccount.address.plain(), SYMBOL.CURRENCY.MOSAIC_ID, 1);
+  const transaction = client.mint(recipientAccount.address.plain(), SYMBOL.CURRENCY.MOSAIC_ID, hashPair.secret, 1);
   const signedTx = await client.sign(SYMBOL.PRIVATEKEY.FROM, transaction);
   console.log('----- wait until transaction is approved -----', {
     fromAddress: senderAccount.address.pretty(),

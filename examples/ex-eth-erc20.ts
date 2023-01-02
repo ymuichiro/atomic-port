@@ -1,6 +1,6 @@
 import { ETH } from './config';
 import { HTLCERC20Service } from '../src/servicies/HTLCERC20Service';
-import { Contracts } from '../src/cores/Contracts';
+import { Contracts } from '../src/models/Contracts';
 
 (async () => {
   // setup
@@ -9,8 +9,9 @@ import { Contracts } from '../src/cores/Contracts';
   const AccountService = client.web3.eth.accounts;
   const fromAddress = AccountService.wallet.add(PRIVATEKEY.FROM).address;
   const toAddress = AccountService.wallet.add(PRIVATEKEY.TO).address;
+  const hashPair = client.createHashPair();
   // mint
-  const { result, hashPair } = await client.mint(toAddress, fromAddress, 1, TOKEN.ALICE);
+  const result = await client.mint(toAddress, fromAddress, hashPair.secret, 1, TOKEN.ALICE);
   console.log('----- Lock transaction enlistment completed -----', {
     fromAddress: fromAddress,
     toAddress: toAddress,
