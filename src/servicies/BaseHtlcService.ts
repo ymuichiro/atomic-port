@@ -1,6 +1,8 @@
 import Web3 from 'web3';
+import crypto from 'crypto';
 import { AbiItem } from 'web3-utils';
 import { Contract } from 'web3-eth-contract';
+import { HashPair } from '../models/core';
 
 /**
  * HTLC operations on the Ethereum Test Net.
@@ -16,6 +18,20 @@ export class BaseHTLCService {
   }
 
   /**
+   * create a new hash pair
+   * If you specify an existing secret or proof in the constructor, take over that value
+   */
+  public createHashPair(): HashPair {
+    const s = crypto.randomBytes(32);
+    const p1 = crypto.createHash('sha256').update(s).digest();
+    const p2 = crypto.createHash('sha256').update(p1).digest();
+    return {
+      proof: '0x' + s.toString('hex'),
+      secret: '0x' + p2.toString('hex'),
+    };
+  }
+
+  /**
    * Obtain contract information for the current instance
    */
   public getContractInfo(contractId: string) {
@@ -28,7 +44,6 @@ export class BaseHTLCService {
    */
   public refund(contractId: string, senderAddress: string, gasLimit?: number) {
     const gas = gasLimit ?? 1000000;
-    return this.contract.methods.refund(contractId)
-    .send({ from: senderAddress, gas: gas.toString() });
+    return this.contract.methods.refund(contractId).send({ from: senderAddress, gas: gas.toString() });
   }
 }

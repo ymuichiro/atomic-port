@@ -3,7 +3,6 @@ import HashedTimelockERC721 from '../abis/HashedTimelockERC721.json';
 import ERC721Abi from '../abis/ERC721.json';
 import { MintOptions } from '../models/core';
 import { BaseHTLCService } from './BaseHTLCService';
-import { createHashPairForEvm } from '../cores/HashPair';
 import { HTLCERC721MintResult, HTLCERC721WithDrawResult } from '../models/HTLCERC721';
 
 /**
@@ -24,10 +23,11 @@ export class HTLCERC721Service extends BaseHTLCService {
   public async mint(
     recipientAddress: string,
     senderAddress: string,
+    secret: string,
     tokenId: number,
     tokenAddress: string,
     options?: MintOptions
-  ) {
+  ): Promise<HTLCERC721MintResult> {
     // Pre-register before issuing a transaction
     const erc721TokenContract = new this.web3.eth.Contract(ERC721Abi.abi as any, tokenAddress);
     const gas = options?.gasLimit ?? 1000000;
@@ -36,11 +36,9 @@ export class HTLCERC721Service extends BaseHTLCService {
       .send({ from: senderAddress, gas: gas.toString() });
     // Issue lock transaction
     const lockPeriod = Math.floor(Date.now() / 1000) + (options?.lockSeconds ?? 3600);
-    const hashPair = createHashPairForEvm();
-    const res = await this.contract.methods
-      .newContract(recipientAddress, hashPair.secret, lockPeriod, tokenAddress, tokenId)
+    return await this.contract.methods
+      .newContract(recipientAddress, secret, lockPeriod, tokenAddress, tokenId)
       .send({ from: senderAddress, gas: gas.toString() });
-    return { result: res as HTLCERC721MintResult, hashPair };
   }
 
   /**

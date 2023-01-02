@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { firstValueFrom } from 'rxjs';
 import { NetworkType } from 'symbol-sdk/dist/src/model/network/NetworkType';
 import { RepositoryFactoryHttp } from 'symbol-sdk/dist/src/infrastructure/RepositoryFactoryHttp';
@@ -12,13 +13,17 @@ import { Address } from 'symbol-sdk/dist/src/model/account/Address';
 import { Convert } from 'symbol-sdk/dist/src/core/format/Convert';
 import { SecretLockInfo } from 'symbol-sdk/dist/src/model/lock/SecretLockInfo';
 import { SecretProofTransaction } from 'symbol-sdk/dist/src/model/transaction/SecretProofTransaction';
-import { createHashPairForSymbol } from '../cores/HashPair';
 import { sha3_256 as sha3 } from 'js-sha3';
 import { RawAddress } from 'symbol-sdk/dist/src/core/format/RawAddress';
 import { Transaction } from 'symbol-sdk/dist/src/model/transaction/Transaction';
 import { SignedTransaction } from 'symbol-sdk/dist/src/model/transaction/SignedTransaction';
 import { MintOptions } from '../models/core';
+import { HashPair } from '../models/core';
 
+/**
+ * Handles secret locks and secret proofs in Symbol
+ * Create a key with `createHashPair` --> issue a lock transaction with `mint` --> unlock with `withDraw`.
+ */
 class HTLCSymbolService {
   private readonly node: string;
   private readonly networkType: NetworkType;
@@ -33,20 +38,38 @@ class HTLCSymbolService {
   }
 
   /**
+   * create a new hash pair
+   * If you specify an existing secret or proof in the constructor, take over that value
+   */
+  public createHashPair(): HashPair {
+    const s = crypto.randomBytes(32);
+    const p1 = crypto.createHash('sha256').update(s).digest();
+    const p2 = crypto.createHash('sha256').update(p1).digest();
+    return {
+      proof: s.toString('hex').toUpperCase(),
+      secret: p2.toString('hex').toUpperCase(),
+    };
+  }
+
+  /**
    * Issue a secret lock and return the results and key.
    */
-  public mint(recipientAddress: string, mosaicId: string, amount: number, options?: MintOptions) {
-    const hashPair = createHashPairForSymbol();
-    const transaction = SecretLockTransaction.create(
+  public mint(
+    recipientAddress: string,
+    mosaicId: string,
+    secret: string,
+    amount: number,
+    options?: MintOptions
+  ): SecretLockTransaction {
+    return SecretLockTransaction.create(
       Deadline.create(this.epochAdjustment),
       new Mosaic(new MosaicId(mosaicId), UInt64.fromUint(amount)),
       UInt64.fromUint(options?.lockSeconds ?? 5760),
       LockHashAlgorithm.Op_Hash_256,
-      hashPair.secret,
+      secret,
       Address.createFromRawAddress(recipientAddress),
       this.networkType
     ).setMaxFee(options?.gasLimit ?? 100) as SecretLockTransaction;
-    return { transaction, hashPair };
   }
 
   /**
@@ -74,9 +97,6 @@ class HTLCSymbolService {
     return signedTransaction;
   }
 
-  /**
-   * --
-   */
   public getHash(hexSecret: string, recipientAddress: string): string {
     const uint8Address = RawAddress.stringToAddress(recipientAddress);
     const uint8Secret = Convert.hexToUint8(hexSecret);
@@ -90,9 +110,6 @@ class HTLCSymbolService {
     return await firstValueFrom(secretLockRepo.search({ secret }));
   }
 
-  /**
-   * --
-   */
   public async getLockTransaction(compositeHash: string): Promise<SecretLockInfo> {
     const repo = new RepositoryFactoryHttp(this.node);
     const secretLockRepo = repo.createSecretLockRepository();

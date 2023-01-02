@@ -1,9 +1,8 @@
 import { AbiItem } from 'web3-utils';
 import HashedTimelockAbi from '../abis/HashedTimelock.json';
-import { createHashPairForEvm } from '../cores/HashPair';
 import { MintOptions } from '../models/core';
 import { HTLCMintResult, HTLCWithDrawResult } from '../models/HTLC';
-import { BaseHTLCService } from './BaseHtlcService';
+import { BaseHTLCService } from './BaseHTLCService';
 
 /**
  * HTLC operations on the Ethereum Test Net.
@@ -17,15 +16,19 @@ export class HTLCService extends BaseHTLCService {
   /**
    * Issue HTLC and obtain the key at the time of issue
    */
-  public async mint(recipientAddress: string, senderAddress: string, amount: number, options?: MintOptions) {
-    const hashPair = createHashPairForEvm();
+  public async mint(
+    recipientAddress: string,
+    senderAddress: string,
+    secret: string,
+    amount: number,
+    options?: MintOptions
+  ): Promise<HTLCMintResult> {
     const value = this.web3.utils.toWei(this.web3.utils.toBN(amount), 'finney');
     const lockPeriod = Math.floor(Date.now() / 1000) + (options?.lockSeconds ?? 3600);
     const gas = options?.gasLimit ?? 1000000;
-    const result = await this.contract.methods
-      .newContract(recipientAddress, hashPair.secret, lockPeriod)
+    return await this.contract.methods
+      .newContract(recipientAddress, secret, lockPeriod)
       .send({ from: senderAddress, gas: gas.toString(), value });
-    return { result: result as HTLCMintResult, hashPair };
   }
 
   /**
