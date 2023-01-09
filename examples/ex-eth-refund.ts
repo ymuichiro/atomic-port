@@ -1,7 +1,7 @@
 import { ETH } from './config';
 import { HTLCService } from '../src/servicies/HTLCService';
 import { Contracts } from '../src/models/Contracts';
-import { MintOptions } from '../src/models/core';
+import { LockOptions } from '../src/models/core';
 
 (async () => {
   // setup
@@ -11,11 +11,11 @@ import { MintOptions } from '../src/models/core';
   const fromAddress = AccountService.wallet.add(PRIVATEKEY.FROM).address;
   const toAddress = AccountService.wallet.add(PRIVATEKEY.TO).address;
   const hashPair = client.createHashPair();
-  // mint
-  const options: MintOptions = {
+  // lock
+  const options: LockOptions = {
     lockSeconds: 50,
   };
-  const result = await client.mint(toAddress, fromAddress, hashPair.secret, 1, options);
+  const result = await client.lock(toAddress, fromAddress, hashPair.secret, 1, options);
   console.log('----- Lock transaction enlistment completed -----', {
     fromAddress: fromAddress,
     toAddress: toAddress,

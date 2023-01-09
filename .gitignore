@@ -26,3 +26,7 @@ node_modules/
 # custom
 dist
 .DS_Store
+
+abi/
+build/
+

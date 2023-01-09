@@ -1,7 +1,7 @@
 import { AbiItem } from 'web3-utils';
 import HashedTimelockERC721 from '../abis/HashedTimelockERC721.json';
 import ERC721Abi from '../abis/ERC721.json';
-import { MintOptions } from '../models/core';
+import { LockOptions } from '../models/core';
 import { BaseHTLCService } from './BaseHTLCService';
 import { HTLCERC721MintResult, HTLCERC721WithDrawResult } from '../models/HTLCERC721';
 
@@ -20,13 +20,13 @@ export class HTLCERC721Service extends BaseHTLCService {
   /**
    * Issue HTLC and obtain the key at the time of issue
    */
-  public async mint(
+  public async lock(
     recipientAddress: string,
     senderAddress: string,
     secret: string,
     tokenId: number,
     tokenAddress: string,
-    options?: MintOptions
+    options?: LockOptions
   ): Promise<HTLCERC721MintResult> {
     // Pre-register before issuing a transaction
     const erc721TokenContract = new this.web3.eth.Contract(ERC721Abi.abi as any, tokenAddress);

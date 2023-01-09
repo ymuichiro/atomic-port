@@ -14,15 +14,15 @@ export namespace Contracts {
   export namespace sepolia {
     export const native: ContractConfig = {
       endpoint: 'https://sepolia.infura.io/v3/85eb73cb20fc46058b5044657ed33efd',
-      contractAddress: '0x822f315505C67727E3bDC89b8ff7a5cEc3dDEBF7',
+      contractAddress: '0x549DEC2d00C3db272F337Ac4874503Ecf5205955',
     };
     export const erc20: ContractConfig = {
       endpoint: 'https://sepolia.infura.io/v3/85eb73cb20fc46058b5044657ed33efd',
-      contractAddress: '0x13cf057B85085972a2FffdB73E952b1F5E850C0d',
+      contractAddress: '0xbD674927a77f4Ca6f01Ac470A33747E060C3Ccd0',
     };
     export const erc721: ContractConfig = {
       endpoint: 'https://sepolia.infura.io/v3/85eb73cb20fc46058b5044657ed33efd',
-      contractAddress: '0x010f8d96C3D3BbA7b3935da8B20AAB3C9E2F6264',
+      contractAddress: '0x4Bf07078493464447732B2a23126697b1C85DF9F',
     };
   }
 

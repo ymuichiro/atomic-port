@@ -1,4 +1,4 @@
-export interface MintOptions {
+export interface LockOptions {
   gasLimit?: number;
   lockSeconds?: number;
 }
