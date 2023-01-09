@@ -10,8 +10,8 @@ import { Contracts } from '../src/models/Contracts';
   const fromAddress = AccountService.wallet.add(PRIVATEKEY.FROM).address;
   const toAddress = AccountService.wallet.add(PRIVATEKEY.TO).address;
   const hashPair = client.createHashPair();
-  // mint
-  const result = await client.mint(toAddress, fromAddress, hashPair.secret, 1);
+  // lock
+  const result = await client.lock(toAddress, fromAddress, hashPair.secret, 1);
   console.log('----- Lock transaction enlistment completed -----', {
     fromAddress: fromAddress,
     toAddress: toAddress,

@@ -40,7 +40,7 @@ const client = new HTLCSymbolService(
 );
 const recipientAccount = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.TO, NetworkType.TEST_NET);
 const senderAccount = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.FROM, NetworkType.TEST_NET);
-const { hashPair, transaction } = client.mint(recipientAccount.address.plain(), SYMBOL.CURRENCY.MOSAIC_ID, 1);
+const { hashPair, transaction } = client.lock(recipientAccount.address.plain(), SYMBOL.CURRENCY.MOSAIC_ID, 1);
 const signedTx = await client.sign(SYMBOL.PRIVATEKEY.FROM, transaction);
 ```
 
@@ -63,7 +63,7 @@ const client = new HTLCService(Contracts.sepolia.native.endpoint, Contracts.sepo
 const AccountService = client.web3.eth.accounts;
 const fromAddress = AccountService.wallet.add(PRIVATEKEY.FROM).address;
 const toAddress = AccountService.wallet.add(PRIVATEKEY.TO).address;
-const { result, hashPair } = await client.mint(toAddress, fromAddress, 1);
+const { result, hashPair } = await client.lock(toAddress, fromAddress, 1);
 ```
 
 ## Secret proofs are issued on the EVM side.

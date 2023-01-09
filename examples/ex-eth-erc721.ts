@@ -13,8 +13,8 @@ import { Contracts } from '../src/models/Contracts';
   // create token for test
   const tokenId = Math.floor(1000 * Math.random() * 10); // Once used, the Id is not available
   const newToken = await client.createToken(TOKEN.ERC721, fromAddress, tokenId);
-  // mint
-  const result = await client.mint(toAddress, fromAddress, hashPair.secret, Number(newToken.tokenId), TOKEN.ERC721);
+  // lock
+  const result = await client.lock(toAddress, fromAddress, hashPair.secret, Number(newToken.tokenId), TOKEN.ERC721);
   console.log('----- Lock transaction enlistment completed -----', {
     fromAddress: fromAddress,
     toAddress: toAddress,

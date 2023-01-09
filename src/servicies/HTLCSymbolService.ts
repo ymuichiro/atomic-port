@@ -17,7 +17,7 @@ import { sha3_256 as sha3 } from 'js-sha3';
 import { RawAddress } from 'symbol-sdk/dist/src/core/format/RawAddress';
 import { Transaction } from 'symbol-sdk/dist/src/model/transaction/Transaction';
 import { SignedTransaction } from 'symbol-sdk/dist/src/model/transaction/SignedTransaction';
-import { MintOptions } from '../models/core';
+import { LockOptions } from '../models/core';
 import { HashPair } from '../models/core';
 
 /**
@@ -54,12 +54,12 @@ class HTLCSymbolService {
   /**
    * Issue a secret lock and return the results and key.
    */
-  public mint(
+  public lock(
     recipientAddress: string,
     mosaicId: string,
     secret: string,
     amount: number,
-    options?: MintOptions
+    options?: LockOptions
   ): SecretLockTransaction {
     return SecretLockTransaction.create(
       Deadline.create(this.epochAdjustment),

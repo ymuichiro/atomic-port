@@ -1,6 +1,6 @@
 import { AbiItem } from 'web3-utils';
 import HashedTimelockAbi from '../abis/HashedTimelock.json';
-import { MintOptions } from '../models/core';
+import { LockOptions } from '../models/core';
 import { HTLCMintResult, HTLCWithDrawResult } from '../models/HTLC';
 import { BaseHTLCService } from './BaseHTLCService';
 
@@ -16,12 +16,12 @@ export class HTLCService extends BaseHTLCService {
   /**
    * Issue HTLC and obtain the key at the time of issue
    */
-  public async mint(
+  public async lock(
     recipientAddress: string,
     senderAddress: string,
     secret: string,
     amount: number,
-    options?: MintOptions
+    options?: LockOptions
   ): Promise<HTLCMintResult> {
     const value = this.web3.utils.toWei(this.web3.utils.toBN(amount), 'finney');
     const lockPeriod = Math.floor(Date.now() / 1000) + (options?.lockSeconds ?? 3600);
