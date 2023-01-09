@@ -14,6 +14,8 @@
   },
   "scripts": {
     "build:sepolia": "truffle migrate --network sepolia --reset",
+    "build:rinkeby": "truffle migrate --network rinkeby --reset",
+    "build:polygonTestnet": "truffle migrate --network polygonTestnet --reset",
     "start:ganache": "ganache-cli --networkId 4447 --port 7545",
     "start:truffle": "truffle console",
     "lint": "solium -d contracts/",
