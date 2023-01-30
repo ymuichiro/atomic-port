@@ -3,7 +3,7 @@ import ERC20Abi from '../abis/ERC20.json';
 import HashedTimelockERC20 from '../abis/HashedTimelockERC20.json';
 import { LockOptions } from '../models/core';
 import { HTLCERC20MintResult, HTLCERC20WithDrawResult } from '../models/HTLCERC20';
-import { BaseHTLCService } from './BaseHTLCService';
+import { BaseHTLCService } from './BaseService';
 
 /**
  * HTLC operations on the Ethereum Test Net.

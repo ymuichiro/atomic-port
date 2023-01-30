@@ -2,7 +2,7 @@ import { AbiItem } from 'web3-utils';
 import HashedTimelockERC721 from '../abis/HashedTimelockERC721.json';
 import ERC721Abi from '../abis/ERC721.json';
 import { LockOptions } from '../models/core';
-import { BaseHTLCService } from './BaseHTLCService';
+import { BaseHTLCService } from './BaseService';
 import { HTLCERC721MintResult, HTLCERC721WithDrawResult } from '../models/HTLCERC721';
 
 /**

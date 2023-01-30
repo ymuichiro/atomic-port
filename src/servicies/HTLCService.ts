@@ -2,7 +2,7 @@ import { AbiItem } from 'web3-utils';
 import HashedTimelockAbi from '../abis/HashedTimelock.json';
 import { LockOptions } from '../models/core';
 import { HTLCMintResult, HTLCWithDrawResult } from '../models/HTLC';
-import { BaseHTLCService } from './BaseHTLCService';
+import { BaseHTLCService } from './BaseService';
 
 /**
  * HTLC operations on the Ethereum Test Net.
