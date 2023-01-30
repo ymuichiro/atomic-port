@@ -1,5 +1,5 @@
 {
-  "name": "evm-symbol-swap",
+  "name": "atomic-port",
   "version": "0.0.2",
   "description": "Cross-chain swap by HTLC between EVM-based blockchain and others",
   "main": "./dist/cjs/index.js",

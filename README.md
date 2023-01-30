@@ -1,10 +1,26 @@
 <div align="center">
-<img src="assets/evm-symbol-swap-logo-wide.png" alt="evm-symbol-swap-logo" title="evm-symbol-swap-logo">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/atomic_port_white.png">
+  <source media="(prefers-color-scheme: light)" srcset="./assets/atomic_port_blue.png">
+  <img alt="logo" src="./assets/atomic_port_blue.png">
+</picture>
 </div>
 
-# EVM <-> Symbol Swap
+# Atomic port
 
 This package is for HTLC transactions between the EVM blockchain and Symbol. Usage and examples are shown below.
+
+## Test is now open to the public.
+
+Transactions on each chain in this library are currently available only on the testnet.
+If you wish to process in the production environment, please add the production network parameters below.
+
+`./src/models/Contracts.ts`
+
+In addition, EVM-based chains require smart contracts to be deployed.
+The required Solidity files are stored in the following folder, so please deploy them yourself when using them in the production environment.
+
+`./sol`
 
 ## Introduction
 
