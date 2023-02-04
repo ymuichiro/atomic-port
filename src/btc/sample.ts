@@ -12,7 +12,7 @@ const bobWif = 'cQBwuzEBYQrbWKFZZFpgitRpdDDxUrT1nzvhDWhxMmFtWdRnrCSm';
 // const network = coininfo.monacoin.test.toBitcoinJS()
 import BitCoin from './bitcoin';
 const network = bitcoin.networks.testnet;
-const swap = new btcSwap(new BitCoin(), network);
+const swap = new btcSwap(new BitCoin());
 const Alice = ECPair.fromWIF(aliceWif, network);
 const Bob = ECPair.fromWIF(bobWif, network);
 

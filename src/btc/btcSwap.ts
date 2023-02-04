@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const varuint = require('varuint-bitcoin');
 
 export interface Coin {
+  network: bitcoin.networks.Network;
   getCurrentBlockHeight: () => Promise<number>;
   postTransaction(txhex: string): Promise<any>;
   getUtxos(address: string): Promise<{ hash: string; index: number; value: number }[]>;
@@ -33,9 +34,9 @@ export class btcSwap {
   public coin: Coin;
   public network: bitcoin.networks.Network;
 
-  constructor(coin: Coin, network: any) {
+  constructor(coin: Coin) {
     this.coin = coin;
-    this.network = network;
+    this.network = coin.network;
   }
 
   public async lock(

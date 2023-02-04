@@ -18,6 +18,7 @@ const {
 });
 
 export default class BitCoin implements Coin {
+  public network = bitcoin.networks.testnet;
   public baseUrl = 'https://mempool.space/testnet';
 
   async getCurrentBlockHeight(): Promise<number> {
