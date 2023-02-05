@@ -2,63 +2,52 @@
   "name": "atomic-port",
   "version": "0.0.2",
   "description": "Cross-chain swap by HTLC between EVM-based blockchain and others",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/esm/index.d.ts",
   "license": "MIT",
-  "author": "Symbol",
+  "author": "Symbol Blockchain Community",
   "private": false,
-  "keywords": [
-    "ethereum",
-    "symbol",
-    "htlc",
-    "cross-chain-swap"
-  ],
   "contributors": [
     "faunsu19000",
     "0x070696E65"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ymuichiro/evm-symbol-swap"
+    "url": "https://github.com/ymuichiro/atomic-port"
   },
   "engines": {
-    "node": ">=12.22.1"
+    "node": ">=12.22.1",
+    "yarn": "Do not use. This project is managed by npm workspace."
   },
-  "bugs": "https://github.com/ymuichiro/evm-symbol-swap/issues",
-  "files": [
-    "dist",
-    "package.json",
-    "package-lock.json",
-    "tsconfig.json"
-  ],
-  "scripts": {
-    "build": "npm run pre-build && npx tsc && npx tsc -p tsconfig.esm.json",
-    "pre-build": "eslint './src/**/*.{ts, js, json}' && prettier --write src"
-  },
-  "peerDependencies": {
-    "symbol-sdk": "^2.0.3",
-    "web3": "^1.8.1"
-  },
+  "bugs": "https://github.com/ymuichiro/atomic-port/issues",
+  "homepage": "https://github.com/ymuichiro/atomic-port",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.46.1",
-    "@typescript-eslint/experimental-utils": "^5.46.1",
     "@typescript-eslint/parser": "^5.46.1",
     "eslint": "^8.29.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.8.1",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.4"
   },
-  "dependencies": {
-    "@mempool/mempool.js": "^2.3.0",
-    "bip65": "^1.0.3",
-    "bitcoinjs-lib": "^6.1.0",
-    "coininfo": "^5.2.1",
-    "ecpair": "^2.1.0",
-    "tiny-secp256k1": "^2.2.1",
-    "varuint-bitcoin": "^1.1.2"
+  "workspaces": [
+    "packages/evm",
+    "packages/bitcoin",
+    "packages/symbol",
+    "packages/mona",
+    "packages/types"
+  ],
+  "scripts": {
+    "build": "run-s build:*",
+    "build:evm": "npm run build -w packages/evm",
+    "build:symbol": "npm run build -w packages/symbol",
+    "build:bitcoin": "npm run build -w packages/bitcoin",
+    "build:mona": "npm run build -w packages/mona",
+    "test": "run-s test:*",
+    "test:evm": "npm run pre-build -w packages/evm",
+    "test:symbol": "npm run pre-build -w packages/symbol",
+    "test:bitcoin": "npm run pre-build -w packages/bitcoin",
+    "test:mona": "npm run pre-build -w packages/mona"
   }
 }

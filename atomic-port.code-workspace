@@ -6,8 +6,5 @@
   ],
   "settings": {
     "solidity.packageDefaultDependenciesDirectory": "sol/node_modules"
-  },
-  "extensions": {
-    "recommendations": ["juanblanco.solidity"]
   }
 }
