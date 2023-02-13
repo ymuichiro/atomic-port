@@ -1,103 +1,131 @@
 <div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/atomic_port_white.png">
-  <source media="(prefers-color-scheme: light)" srcset="./assets/atomic_port_blue.png">
-  <img alt="logo" src="./assets/atomic_port_blue.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/47295014/218366041-d07fdf06-1b72-4c6d-8fa2-89dc8266553d.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/47295014/218366194-eee5969d-3c4c-4445-9303-5368c66aac9a.png">
+  <img alt="logo" src="https://user-images.githubusercontent.com/47295014/218366194-eee5969d-3c4c-4445-9303-5368c66aac9a.png">
 </picture>
 </div>
 
 # Atomic port
 
-This package is for HTLC transactions between the EVM blockchain and Symbol. Usage and examples are shown below.
+This package is for HTLC transactions between the any blockchains. HTLC stands for Hashed time lock contract. HTLC allows direct transactions between different chains. Usage and examples are shown below.
+
+<br>
 
 ## Test is now open to the public.
 
 Transactions on each chain in this library are currently available only on the testnet.
-If you wish to process in the production environment, please add the production network parameters below.
+If you wish to use it in a production environment, please change the network and other parameters.
 
-`./src/models/Contracts.ts`
+<br>
 
-In addition, EVM-based chains require smart contracts to be deployed.
-The required Solidity files are stored in the following folder, so please deploy them yourself when using them in the production environment.
+## Chains or Tokens
 
-`./sol`
+The following chains & tokens are supported
 
-## Introduction
+- Bitcoin
+  - [about bitcoin](https://bitcoin.org/)
+  - [htlc package](./packages/bitcoin/README.md)
+- Ethereum
+  - [about ethereum](https://ethereum.org/)
+  - [htlc package](./packages/evm/README.md)
+- Polygon
+  - [about polygon](https://polygon.technology/)
+  - [htlc package](./packages/evm/README.md)
+- JPYC
+  - [about jpyc](https://jpyc.jp/)
+  - [htlc package](./packages/evm/README.md)
+- MONA
+  - [about mona](https://monacoin.org/)
+  - [htlc package](./packages/mona/README.md)
+- Symbol
+  - [about symbol](https://symbol-community.com/)
+  - [htlc package](./packages/symbol/README.md)
 
-Install the necessary libraries
+## Example
 
-**npm**
-
-```
-npm install --save symbol-sdk@2 web3
-```
-
-**yarn**
-
-```
-yarn add symbol-sdk@2 web3
-```
-
-HTLC issues a secret and key in advance and uses this to issue a secret lock.
-When both parties agree to the transaction, the secret and key are exchanged separately, and the key is used to receive a token.
-This is how the cross-chain swap is performed.
-
-## Issue a secret lock on the Symbol side
-
-You can publish using this package with the following operations.
-The output hashPair contains a secret and a proof. The secret is shared in advance, and the proof is issued at a mutually agreed timing.
+A lock transaction is created to execute HTLC and initiate the transaction.
+The executor keeps the generated Proof and shares the Secret with the counterparty.
 
 ```ts
-const client = new HTLCSymbolService(
-  Contracts.symbol.testnet.endpoint,
-  NetworkType.TEST_NET,
-  Contracts.symbol.testnet.generationHashSeed,
-  Contracts.symbol.testnet.epochAdjustment
-);
-const recipientAccount = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.TO, NetworkType.TEST_NET);
-const senderAccount = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.FROM, NetworkType.TEST_NET);
-const { hashPair, transaction } = client.lock(recipientAccount.address.plain(), SYMBOL.CURRENCY.MOSAIC_ID, 1);
-const signedTx = await client.sign(SYMBOL.PRIVATEKEY.FROM, transaction);
+async function lock() {
+  // setup
+  const client = new SymbolHtlc(
+    SYMBOL.NETWORK.ENDPOINT,
+    NetworkType.TEST_NET,
+    SYMBOL.NETWORK.GENERATION_HASH_SEED,
+    SYMBOL.NETWORK.EPOCH_ADJUSTMENT
+  );
+  const recipientAccount = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.TO, NetworkType.TEST_NET);
+  const senderAccount = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.FROM, NetworkType.TEST_NET);
+  const hashPair = client.createHashPair();
+  // lock
+  const transaction = client.lock(recipientAccount.address.plain(), SYMBOL.CURRENCY.MOSAIC_ID, hashPair.secret, 1);
+  const signedTx = await client.sign(SYMBOL.PRIVATEKEY.FROM, transaction);
+  console.log('----- wait until transaction is approved -----', {
+    fromAddress: senderAccount.address.pretty(),
+    toAddress: recipientAccount.address.pretty(),
+    transactionHash: signedTx.hash,
+    proof: hashPair.proof,
+    secret: hashPair.secret,
+  });
+  // Wait for secret transaction to be approved
+  await waitConfirmedTransaction(SYMBOL.NETWORK.ENDPOINT, senderAccount.address, signedTx.hash);
+}
+
+async function start() {
+  await lock();
+}
 ```
 
-## Symbol side issues secret proof
-
-With a secret lock, locked assets are withdrawn through a secret proof transaction.
+When a transaction is completed, you will receive tokens from the block.
+The Proof generated at this time is used.
 
 ```ts
-const drawTx = client.withDraw(recipientAccount.address.plain(), hashPair.proof, hashPair.secret);
-const signedTx = await client.sign(recipientAccount.privateKey, drawTx);
+async function withDraw(proof: string, secret: string) {
+  const client = new SymbolHtlc(
+    SYMBOL.NETWORK.ENDPOINT,
+    NetworkType.TEST_NET,
+    SYMBOL.NETWORK.GENERATION_HASH_SEED,
+    SYMBOL.NETWORK.EPOCH_ADJUSTMENT
+  );
+  const recipientAccount = Account.createFromPrivateKey(SYMBOL.PRIVATEKEY.TO, NetworkType.TEST_NET);
+  const drawTx = client.withDraw(recipientAccount.address.plain(), proof, secret);
+  const signedTx = await client.sign(recipientAccount.privateKey, drawTx);
+  console.log('waiting...', signedTx.hash);
+  await waitConfirmedTransaction(SYMBOL.NETWORK.ENDPOINT, recipientAccount.address, signedTx.hash);
+  console.log(signedTx);
+}
+
+async function start() {
+  const proof = '************************';
+  const secret = '************************';
+  await withDraw(proof, secret);
+}
 ```
 
-## Issue a secret lock on the EVM side
+An example of a flow is shown below.
+※ If you cannot see the following as a figure, please check with your browser.
 
-As when issued with Symbol, the asset is pre-locked and a secret and proof are issued.
-The output hashPair contains a secret and a proof.
-
-```ts
-const client = new HTLCService(Contracts.sepolia.native.endpoint, Contracts.sepolia.native.contractAddress);
-const AccountService = client.web3.eth.accounts;
-const fromAddress = AccountService.wallet.add(PRIVATEKEY.FROM).address;
-const toAddress = AccountService.wallet.add(PRIVATEKEY.TO).address;
-const { result, hashPair } = await client.lock(toAddress, fromAddress, 1);
+```mermaid
+sequenceDiagram
+    actor Alice
+    participant Chain A
+    participant Chain B
+    actor Bob
+    Note over Alice,Bob: Start trading
+    Note over Alice: Create Secret&Proof
+    Alice ->>  Chain A: Create Lock Tx(A) from Secret
+    Note over Chain A: Tx Alice to Bob(is Lock)
+    Alice -->> Bob:  Secret used is shared separately
+    Bob -->> Chain A: Check if lock Tx(A) has block
+    Bob ->> Chain B: Create Lock Tx(B) from Secret
+    Note over Chain B: Tx Bob to Alice(is Lock)
+    Alice -->> Chain B: Check if lock Tx(B) has block
+    Alice ->> Chain B: Unlock Tx(B) using owned Proof
+    Note over Chain B: Tx Bob to Alice(is unlock)
+    Bob -->> Chain B: Get proof by Tx(B)
+    Bob ->> Chain A: Unlock Tx(A) using acquired Proof
+    Note over Chain A: Tx Alice to Bob(is unlock)
+    Note over Alice,Bob: Transaction Completed
 ```
-
-## Secret proofs are issued on the EVM side.
-
-The EVM also withdraws the locked assets when indicating the completion of the transaction.
-
-```ts
-const res = await client.withDraw(result.events.LogHTLCNew.returnValues.contractId, toAddress, hashPair.proof);
-```
-
-For more detailed examples, please check the sample collection below
-[examples](examples/README.md)
-
-## Chains
-
-The following chains are supported
-
-- [ethereum](https://ethereum.org/)
-- [polygon](https://polygon.technology/)
-- [jpyc](https://jpyc.jp/)
-- [symbol](https://symbol-community.com/)

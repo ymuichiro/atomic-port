@@ -1,0 +1,26 @@
+{
+  "name": "example-evm",
+  "version": "1.0.0",
+  "description": "HTLC processing in EVM",
+  "main": "index.js",
+  "scripts": {
+    "start:lock": "ts-node ./src/native/lock.ts",
+    "start:withDraw": "ts-node ./src/native/withDraw.ts",
+    "start:lock_ERC20": "ts-node ./src/erc20/lock.ts",
+    "start:withDraw_ERC20": "ts-node ./src/erc20/withDraw.ts",
+    "start:lock_ERC20_JPYC": "ts-node ./src/erc20JPYC/lock.ts",
+    "start:withDraw_ERC20_JPYC": "ts-node ./src/erc20JPYC/withDraw.ts",
+    "start:lock_ERC20_POLYGON": "ts-node ./src/erc20Polygon/lock.ts",
+    "start:withDraw_ERC20_POLYGON": "ts-node ./src/erc20Polygon/withDraw.ts",
+    "start:lock_ERC721": "ts-node ./src/erc721/lock.ts",
+    "start:withDraw_ERC721": "ts-node ./src/erc721/withDraw.ts"
+  },
+  "author": "faunsu19000",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5",
+    "web3": "^1.8.2"
+  }
+}
