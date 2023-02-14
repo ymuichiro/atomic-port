@@ -12,6 +12,14 @@ This package is for HTLC transactions between the any blockchains. HTLC stands f
 
 <br>
 
+## Attention
+
+This script was created and released for research and experimentation and is not intended to encourage actual use.
+Trading of crypto assets may require licenses, applications, or approvals in some countries.
+Please consider using them at your own risk.
+
+<br>
+
 ## Test is now open to the public.
 
 Transactions on each chain in this library are currently available only on the testnet.
